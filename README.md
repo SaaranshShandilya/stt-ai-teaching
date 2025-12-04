@@ -55,9 +55,12 @@ make clean
 quarto render data-collection-labeling.qmd --to revealjs
 ```
 
-**Export to PDF:**
+**Export to PDF (from RevealJS HTML using decktape):**
 ```bash
-quarto render data-collection-labeling.qmd --to pdf
+# First build HTML
+quarto render data-collection-labeling.qmd --to revealjs
+# Then convert to PDF
+npx decktape reveal data-collection-labeling.html data-collection-labeling.pdf --chrome-arg=--no-sandbox
 ```
 
 **Navigation (HTML slides):**

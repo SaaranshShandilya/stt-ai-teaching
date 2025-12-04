@@ -18,8 +18,8 @@ site:
 html: $(HTML_FILES)
 	@echo "✓ HTML slides built"
 
-# Build all PDF documents
-pdf: $(PDF_FILES)
+# Build all PDF documents (requires HTML first)
+pdf: html $(PDF_FILES)
 	@echo "✓ PDF documents built"
 
 # Pattern rule for HTML
@@ -27,16 +27,16 @@ pdf: $(PDF_FILES)
 	@echo "Building $< -> $@"
 	@quarto render $< --to revealjs
 
-# Pattern rule for PDF
-%.pdf: %.qmd
-	@echo "Building $< -> $@"
-	@quarto render $< --to pdf
+# Pattern rule for PDF (from RevealJS HTML using decktape)
+%.pdf: %.html
+	@echo "Converting $< -> $@"
+	@npx --yes decktape reveal $< $@ --chrome-arg=--no-sandbox
 
 # Build specific slide by name (without extension)
 %: %.qmd
 	@echo "Building $<"
 	@quarto render $< --to revealjs
-	@quarto render $< --to pdf
+	@npx --yes decktape reveal $*.html $*.pdf --chrome-arg=--no-sandbox
 	@echo "✓ Built $< (HTML + PDF)"
 
 # List all available slides
