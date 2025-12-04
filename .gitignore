@@ -8,6 +8,8 @@ node_modules/
 *.log
 *.aux
 /.quarto/
+/site_libs/
+search.json
 
 # Bun
 bun.lockb

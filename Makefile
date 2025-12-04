@@ -1,4 +1,4 @@
-.PHONY: all clean help html pdf list
+.PHONY: all clean help html pdf list site
 
 # Find all .qmd files (excluding index.qmd)
 SLIDES := $(filter-out index.qmd, $(wildcard *.qmd))
@@ -6,16 +6,17 @@ HTML_FILES := $(SLIDES:.qmd=.html)
 PDF_FILES := $(SLIDES:.qmd=.pdf)
 
 # Default target
-all: html pdf index
+all: site pdf
 	@echo "✓ All slides built successfully"
 
-# Build all HTML slides
+# Build entire Quarto site (including index)
+site:
+	@echo "Building Quarto site..."
+	@quarto render
+
+# Build all HTML slides individually
 html: $(HTML_FILES)
 	@echo "✓ HTML slides built"
-
-# Generate index page
-index:
-	@./generate-index.sh
 
 # Build all PDF documents
 pdf: $(PDF_FILES)

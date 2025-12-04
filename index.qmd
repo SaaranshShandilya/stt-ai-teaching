@@ -1,0 +1,28 @@
+---
+title: "CS 203: Software Tools and Techniques for AI"
+subtitle: "Lecture Slides"
+---
+
+## Course Information
+
+**Instructor:** Prof. Nipun Batra, IIT Gandhinagar
+
+**Course Website:** [nipunbatra.github.io/stt-ai-26](https://nipunbatra.github.io/stt-ai-26/)
+
+## Lecture Slides
+
+:::{.grid}
+
+:::{.g-col-12 .g-col-md-6}
+### Data Collection and Labeling
+Comprehensive coverage of data collection tools, validation techniques, labeling strategies (Label Studio, inter-annotator agreement, active learning), and augmentation methods for images, text, audio, and tabular data.
+
+- [View Slides](data-collection-labeling.html){.btn .btn-primary target="_blank"}
+- [Download PDF](data-collection-labeling.pdf){.btn .btn-secondary}
+:::
+
+:::
+
+---
+
+*More slides will be added throughout the semester*
