@@ -53,6 +53,21 @@ title: "CS 203: Software Tools and Techniques for AI"
 
 ---
 
+## Week 4: HTTP, APIs & FastAPI
+
+**Topics**: HTTP fundamentals, FastAPI, API development, file handling
+
+### Lecture (1.5 hours)
+- [PDF](week4-lecture.pdf) | [HTML](week4-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/week4-lecture.md)
+- Content: HTTP methods/status codes, curl/httpie/jq, FastAPI basics, request/response models, file uploads
+
+### Lab (3 hours)
+- [PDF](week4-lab.pdf) | [HTML](week4-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/week4-lab.md)
+- Exercises: HTTP CLI tools, building APIs, validation, file handling
+- Project: Build a complete Unit Converter API
+
+---
+
 ## Reference Materials
 
 ### Data Collection and Labeling (Full Course Content)
