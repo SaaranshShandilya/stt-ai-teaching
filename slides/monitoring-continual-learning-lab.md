@@ -5,20 +5,7 @@ paginate: true
 backgroundColor: #fff
 ---
 
-<style>
-code {
-  background-color: #f4f4f4;
-}
-section {
-  font-size: 28px;
-  padding-top: 0;
-  justify-content: flex-start;
-}
-h1 {
-  margin-top: 0;
-  padding-top: 0;
-}
-</style>
+style: @import "custom.css";
 
 # Monitoring & Continual Learning
 ## Lab Session

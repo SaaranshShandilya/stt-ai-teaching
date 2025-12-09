@@ -2,16 +2,7 @@
 marp: true
 theme: default
 paginate: true
-style: |
-  section {
-    font-size: 28px;
-    padding-top: 0;
-    justify-content: flex-start;
-  }
-  h1 { margin-top: 0; padding-top: 0; }
-  code {
-    background-color: #f4f4f4;
-  }
+style: @import "custom.css";
 
 ---
 
