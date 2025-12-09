@@ -2,6 +2,7 @@
 marp: true
 theme: default
 paginate: true
+math: mathjax
 style: |
   section { background: white; font-family: 'Inter', sans-serif; font-size: 28px; }
   h1 { color: #1e293b; border-bottom: 3px solid #f59e0b; font-size: 1.6em; margin-bottom: 0.5em; }
@@ -76,6 +77,281 @@ emb3 = model.encode("The feline rests outdoors")
 
 # cosine_similarity(emb1, emb3) > cosine_similarity(emb1, emb2)
 ```
+
+---
+
+# Vector Mathematics: Embeddings as Points
+
+**Embeddings are vectors in high-dimensional space**:
+
+For a sentence, the embedding model produces:
+$$\mathbf{v} = [v_1, v_2, ..., v_d] \in \mathbb{R}^d$$
+
+where $d$ is the dimensionality (e.g., 384, 768, 1536).
+
+**Example** (384-dimensional embedding):
+```python
+emb = model.encode("Hello world")
+print(emb.shape)  # (384,)
+print(emb[:5])    # [ 0.023, -0.145,  0.891, -0.234,  0.567]
+```
+
+**Intuition**: Each dimension captures a semantic feature.
+- Similar words → similar coordinates
+- "king" - "man" + "woman" ≈ "queen" (word2vec analogy)
+
+---
+
+# Similarity Metric 1: Cosine Similarity
+
+**Most common metric for embeddings.**
+
+## Definition
+
+$$\text{cosine\_sim}(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\| \|\mathbf{b}\|} = \frac{\sum_{i=1}^{d} a_i b_i}{\sqrt{\sum_{i=1}^{d} a_i^2} \sqrt{\sum_{i=1}^{d} b_i^2}}$$
+
+**Range**: $[-1, 1]$
+- $1$ = identical direction
+- $0$ = orthogonal (unrelated)
+- $-1$ = opposite direction
+
+**Why cosine?** Embeddings are normalized, so we care about direction, not magnitude.
+
+---
+
+# Cosine Similarity: Worked Example
+
+**Given two embeddings** (simplified to 3D):
+- $\mathbf{a} = [1, 2, 3]$ (embedding for "cat")
+- $\mathbf{b} = [2, 4, 6]$ (embedding for "feline")
+
+## Step 1: Dot Product
+
+$$\mathbf{a} \cdot \mathbf{b} = (1)(2) + (2)(4) + (3)(6) = 2 + 8 + 18 = 28$$
+
+## Step 2: Magnitudes
+
+$$\|\mathbf{a}\| = \sqrt{1^2 + 2^2 + 3^2} = \sqrt{14} \approx 3.742$$
+$$\|\mathbf{b}\| = \sqrt{2^2 + 4^2 + 6^2} = \sqrt{56} \approx 7.483$$
+
+## Step 3: Cosine Similarity
+
+$$\text{cosine\_sim}(\mathbf{a}, \mathbf{b}) = \frac{28}{3.742 \times 7.483} \approx \frac{28}{28} = 1.0$$
+
+**Perfect match!** (b is just 2×a, same direction)
+
+---
+
+# Cosine Similarity in Python
+
+```python
+import numpy as np
+from numpy.linalg import norm
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (norm(a) * norm(b))
+
+# Example
+emb1 = model.encode("The cat sits outside")
+emb2 = model.encode("A feline rests outdoors")
+emb3 = model.encode("A man plays guitar")
+
+print(f"cat vs feline: {cosine_similarity(emb1, emb2):.3f}")  # ~0.85
+print(f"cat vs guitar: {cosine_similarity(emb1, emb3):.3f}")  # ~0.12
+```
+
+**Interpretation**:
+- High similarity (> 0.7) → semantically similar
+- Low similarity (< 0.3) → semantically different
+
+---
+
+# Similarity Metric 2: Euclidean Distance
+
+**Measures straight-line distance in vector space.**
+
+## Definition
+
+$$d(\mathbf{a}, \mathbf{b}) = \|\mathbf{a} - \mathbf{b}\| = \sqrt{\sum_{i=1}^{d} (a_i - b_i)^2}$$
+
+**Range**: $[0, \infty)$
+- $0$ = identical vectors
+- Large value = far apart
+
+**Example** (3D vectors):
+- $\mathbf{a} = [1, 2, 3]$
+- $\mathbf{b} = [4, 5, 6]$
+
+$$d(\mathbf{a}, \mathbf{b}) = \sqrt{(1-4)^2 + (2-5)^2 + (3-6)^2} = \sqrt{9 + 9 + 9} = \sqrt{27} \approx 5.196$$
+
+---
+
+# Similarity Metric 3: Dot Product
+
+**Simplest metric** (used when vectors are normalized).
+
+## Definition
+
+$$\mathbf{a} \cdot \mathbf{b} = \sum_{i=1}^{d} a_i b_i$$
+
+**Range**: $[-\infty, \infty]$ (or $[-1, 1]$ if normalized)
+
+**When to use**:
+- If embeddings are **already L2-normalized** (length = 1)
+- Cosine similarity = dot product for normalized vectors
+- Faster to compute (no division needed)
+
+**Normalization**:
+$$\hat{\mathbf{v}} = \frac{\mathbf{v}}{\|\mathbf{v}\|}$$
+
+---
+
+# Comparison: Cosine vs Euclidean vs Dot Product
+
+| Metric | Formula | Range | Best For |
+|--------|---------|-------|----------|
+| **Cosine** | $\frac{\mathbf{a} \cdot \mathbf{b}}{\|\mathbf{a}\| \|\mathbf{b}\|}$ | $[-1, 1]$ | Semantic similarity (direction) |
+| **Euclidean** | $\|\mathbf{a} - \mathbf{b}\|$ | $[0, \infty)$ | Absolute distance |
+| **Dot Product** | $\mathbf{a} \cdot \mathbf{b}$ | $\mathbb{R}$ | Normalized embeddings |
+
+**Which to use for RAG?**
+- **Cosine** (default for most embedding models)
+- Dot product if embeddings are pre-normalized (faster)
+
+**In practice**: Most vector DBs (ChromaDB, Pinecone) default to cosine or dot.
+
+---
+
+# Approximate Nearest Neighbors (ANN)
+
+**Problem**: Finding exact nearest neighbors is $O(N \cdot d)$ (slow for millions of vectors).
+
+**Solution**: Use approximate algorithms that trade accuracy for speed.
+
+## ANN Algorithms
+
+1. **HNSW** (Hierarchical Navigable Small Worlds)
+   - Graph-based search
+   - Fast queries, high recall
+   - Used by Pinecone, Qdrant
+
+2. **IVF** (Inverted File Index)
+   - Cluster vectors, search only relevant clusters
+   - Used by FAISS
+
+3. **LSH** (Locality Sensitive Hashing)
+   - Hash similar vectors to same bucket
+   - Probabilistic guarantees
+
+---
+
+# Chunking Strategies
+
+**Why chunk?** LLMs have finite context windows, and retrieval is more precise with smaller chunks.
+
+## Common Strategies
+
+1. **Fixed-size chunks**:
+   - Split every 500 characters
+   - Simple but can break mid-sentence
+
+2. **Recursive Character Splitter** (LangChain default):
+   - Try splitting by paragraph, then sentence, then character
+   - Keeps semantic units together
+
+3. **Semantic chunking**:
+   - Use embeddings to find natural breakpoints
+   - More expensive but higher quality
+
+4. **Document-aware chunking**:
+   - Markdown headers, HTML tags, PDF structure
+   - Preserves logical document hierarchy
+
+---
+
+# Chunking: Mathematical Perspective
+
+**Trade-off**: Chunk size vs retrieval granularity.
+
+Let:
+- $L$ = document length (tokens)
+- $C$ = chunk size
+- $O$ = overlap size
+
+**Number of chunks**:
+$$N_{\text{chunks}} = \left\lceil \frac{L - O}{C - O} \right\rceil$$
+
+**Example**:
+- Document: 10,000 tokens
+- Chunk size: 500 tokens
+- Overlap: 50 tokens
+
+$$N = \left\lceil \frac{10000 - 50}{500 - 50} \right\rceil = \left\lceil \frac{9950}{450} \right\rceil = 23 \text{ chunks}$$
+
+**Overlap** ensures no information is lost at boundaries.
+
+---
+
+---
+
+# Retrieval Evaluation Metrics
+
+**How do we know if our RAG system retrieves the right documents?**
+
+## Recall@K
+
+**Definition**: Of all relevant documents, what fraction appears in top-K results?
+
+$$\text{Recall@K} = \frac{|\{\text{relevant docs}\} \cap \{\text{top-K results}\}|}{|\{\text{relevant docs}\}|}$$
+
+**Example**:
+- 5 relevant documents total
+- Top-3 results contain 2 of them
+
+$$\text{Recall@3} = \frac{2}{5} = 0.4$$
+
+**Interpretation**: 40% of relevant docs were retrieved in top-3.
+
+---
+
+# Mean Reciprocal Rank (MRR)
+
+**Measures how high the first relevant result ranks.**
+
+$$\text{MRR} = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \frac{1}{\text{rank}_i}$$
+
+where $\text{rank}_i$ is the position of the first relevant result for query $i$.
+
+**Example**:
+- Query 1: First relevant doc at position 1 → $1/1 = 1.0$
+- Query 2: First relevant doc at position 3 → $1/3 = 0.333$
+- Query 3: First relevant doc at position 2 → $1/2 = 0.5$
+
+$$\text{MRR} = \frac{1}{3}(1.0 + 0.333 + 0.5) = 0.611$$
+
+**Higher is better** (closer to 1 = top result is relevant).
+
+---
+
+# Normalized Discounted Cumulative Gain (NDCG)
+
+**Accounts for both relevance and ranking position.**
+
+## DCG@K (Discounted Cumulative Gain)
+
+$$\text{DCG@K} = \sum_{i=1}^{K} \frac{\text{rel}_i}{\log_2(i + 1)}$$
+
+where $\text{rel}_i$ is the relevance score of result at position $i$ (e.g., 0 or 1, or graded).
+
+## NDCG@K (Normalized DCG)
+
+$$\text{NDCG@K} = \frac{\text{DCG@K}}{\text{IDCG@K}}$$
+
+where IDCG = DCG of the ideal ranking (all relevant docs first).
+
+**Range**: $[0, 1]$, where 1 = perfect ranking.
+
+---
 
 ---
 
