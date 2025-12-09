@@ -13,3 +13,4 @@ bun.lock
 experiments/
 COURSE_AUDIT.md
 DIAGRAM_GUIDE.md
+node_modules/
