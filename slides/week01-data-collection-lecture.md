@@ -33,7 +33,7 @@ IIT Gandhinagar
 
 # The ML Pipeline
 
-![width:900px](figures/data_pipeline_flow.png)
+![width:900px](../figures/data_pipeline_flow.png)
 *[diagram-generators/data_pipeline_flow.py](../diagram-generators/data_pipeline_flow.py)*
 
 **Garbage In, Garbage Out**:
@@ -65,7 +65,7 @@ How browsers (and scripts) talk to servers.
 
 # Client-Server Architecture
 
-![width:700px](figures/http_request_sequence.png)
+![width:700px](../figures/http_request_sequence.png)
 *[diagram-generators/http_request_sequence.py](../diagram-generators/http_request_sequence.py)*
 
 ---
@@ -173,7 +173,7 @@ def get_movie(title):
 **Problem**: Fetching 1,000 movies sequentially is slow.
 **Solution**: Asynchronous Requests (`aiohttp`, `httpx`).
 
-![width:800px](figures/sync_vs_async_timing.png)
+![width:800px](../figures/sync_vs_async_timing.png)
 *[diagram-generators/sync_vs_async_timing.py](../diagram-generators/sync_vs_async_timing.py)*
 
 *We will implement Async in Week 10 (FastAPI).*

@@ -36,7 +36,7 @@ IIT Gandhinagar
 
 # The Validation Pipeline
 
-![width:900px](figures/data_validation_pipeline.png)
+![width:900px](../figures/data_validation_pipeline.png)
 *[diagram-generators/data_validation_pipeline.py](../diagram-generators/data_validation_pipeline.py)*
 
 **Tools**:

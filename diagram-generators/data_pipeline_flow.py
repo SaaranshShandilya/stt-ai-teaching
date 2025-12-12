@@ -1,74 +1,43 @@
+#!/usr/bin/env python3
 """
 Data Pipeline Flow Diagram
 Week 1: Data Collection Lecture
 Illustrates the ML data pipeline stages from collection to deployment
 """
 
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+from graphviz import Digraph
 import os
 
+OUTPUT_DIR = "../figures"
+OUTPUT_FILE = "data_pipeline_flow"
+
 def create_data_pipeline_flow():
-    fig, ax = plt.subplots(figsize=(14, 3))
-    ax.set_xlim(0, 14)
-    ax.set_ylim(0, 3)
-    ax.axis('off')
+    dot = Digraph(comment='ML Data Pipeline', format='png')
+    dot.attr(rankdir='LR', dpi='300')
+    dot.attr('node', shape='box', style='rounded,filled', fontname='Arial',
+            fontsize='16', height='0.6', width='1.5')
+    dot.attr('edge', penwidth='2')
 
-    # Pipeline stages
-    stages = [
-        ("Collection", 1.5, "#ff9966"),
-        ("Validation", 4.0, "#99ccff"),
-        ("Labeling", 6.5, "#99ccff"),
-        ("Training", 9.0, "#99ccff"),
-        ("Deployment", 11.5, "#99ccff")
-    ]
+    # Nodes with colors
+    dot.node('A', 'Collection', fillcolor='#ff9966', penwidth='4')
+    dot.node('B', 'Validation', fillcolor='#99ccff')
+    dot.node('C', 'Labeling', fillcolor='#99ccff')
+    dot.node('D', 'Training', fillcolor='#99ccff')
+    dot.node('E', 'Deployment', fillcolor='#99ccff')
 
-    # Draw boxes and arrows
-    for i, (label, x, color) in enumerate(stages):
-        # Draw box
-        box = FancyBboxPatch(
-            (x - 0.6, 1.2), 1.2, 0.6,
-            boxstyle="round,pad=0.1",
-            facecolor=color,
-            edgecolor='#333333',
-            linewidth=3 if i == 0 else 2,
-            zorder=2
-        )
-        ax.add_patch(box)
+    # Edges
+    dot.edge('A', 'B')
+    dot.edge('B', 'C')
+    dot.edge('C', 'D')
+    dot.edge('D', 'E')
 
-        # Add text
-        ax.text(x, 1.5, label,
-                ha='center', va='center',
-                fontsize=14, fontweight='bold',
-                zorder=3)
-
-        # Draw arrow to next stage
-        if i < len(stages) - 1:
-            next_x = stages[i + 1][1]
-            arrow = FancyArrowPatch(
-                (x + 0.7, 1.5), (next_x - 0.7, 1.5),
-                arrowstyle='->,head_width=0.4,head_length=0.3',
-                color='#333333',
-                linewidth=2,
-                zorder=1
-            )
-            ax.add_patch(arrow)
-
-    # Add title
-    ax.text(7, 2.5, 'ML Data Pipeline',
-            ha='center', va='center',
-            fontsize=16, fontweight='bold')
-
-    plt.tight_layout()
-    return fig
+    return dot
 
 if __name__ == "__main__":
-    output_dir = os.path.join(os.path.dirname(__file__), '..', 'slides', 'figures')
+    output_dir = os.path.join(os.path.dirname(__file__), OUTPUT_DIR)
     os.makedirs(output_dir, exist_ok=True)
 
-    fig = create_data_pipeline_flow()
-    output_path = os.path.join(output_dir, 'data_pipeline_flow.png')
-    plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
-    print(f"Saved: {output_path}")
-    plt.close()
+    dot = create_data_pipeline_flow()
+    output_path = os.path.join(output_dir, OUTPUT_FILE)
+    dot.render(output_path, cleanup=True)
+    print(f"Generated: {output_path}.png")
