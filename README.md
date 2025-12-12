@@ -6,7 +6,7 @@
 
 This repository contains the lecture slides, lab exercises, and course materials for CS 203. The course covers the end-to-end software engineering stack required for modern AI development, from data collection to deployment and monitoring.
 
-## Course Syllabus (17 Weeks)
+## Course Syllabus (15 Weeks)
 
 | Week | Topic | Key Tools |
 | :--- | :--- | :--- |
@@ -23,12 +23,8 @@ This repository contains the lecture slides, lab exercises, and course materials
 | 11 | Git, GitHub Actions & CI/CD | GitHub API, PyGithub, Actions |
 | 12 | Deployment on Constrained Devices | ONNX, Quantization, Pruning |
 | 13 | Profiling & Optimization | PyTorch Profiler, AMP, Distillation |
-| 14 | RAG & Vector Databases | ChromaDB, Embeddings, LangChain |
-| 15 | Cloud Foundations & Orchestration | Docker Compose, AWS/Render |
-| 16 | Model Monitoring & Observability | Evidently AI, Data Drift |
-| 17 | LLM Agents & Tool Use | LangGraph, Tool Use |
-
-
+| 14 | Model Monitoring & Observability | Evidently AI, Data Drift |
+| 15 | Course Summary & Future Trends | LLOps, Edge AI, Final Projects |
 
 ## Building the Slides
 
@@ -85,12 +81,3 @@ If you find an issue with the slides (typos, code errors, outdated content), ple
 ## License
 
 Course materials by Prof. Nipun Batra, IIT Gandhinagar.
-
-## Mermaid Diagrams
-
-Mermaid diagrams are supported in **HTML output only**. They are rendered using mermaid.js via a custom Marp engine.
-
-- **HTML slides**: Mermaid diagrams render correctly
-- **PDF slides**: Mermaid blocks appear as code (limitation of PDF format)
-
-To view slides with diagrams, use the HTML version or present directly from HTML.

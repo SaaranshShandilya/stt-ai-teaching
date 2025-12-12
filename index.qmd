@@ -84,11 +84,11 @@ title: "CS 203: Software Tools and Techniques for AI"
 **Topics**: Gemini API, text generation, vision models, multimodal understanding
 
 ### Lecture (1.5 hours)
-- [PDF](pdf/week06-llm-apis-lecture.pdf) | [HTML](html/week06-llm-apis-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week06-llm-apis-lecture.md)
+- [PDF](pdf/week06-llm-apis-lecture.pdf) | [HTML](html/week06-llm-apis-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week6-llm-apis-lecture.md)
 - Content: LLM API setup, text understanding (NER, sentiment, QA), vision (OCR, object detection), audio/video processing.
 
 ### Lab (3 hours)
-- [PDF](pdf/week06-llm-apis-lab.pdf) | [HTML](html/week06-llm-apis-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week06-llm-apis-lab.md)
+- [PDF](pdf/week06-llm-apis-lab.pdf) | [HTML](html/week06-llm-apis-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week6-llm-apis-lab.md)
 - Exercises: API setup, sentiment analysis, image analysis, OCR, PDF extraction, audio transcription.
 
 ---
@@ -191,59 +191,27 @@ title: "CS 203: Software Tools and Techniques for AI"
 
 ---
 
-## Week 14: RAG & Vector Databases
-
-**Topics**: Retrieval Augmented Generation, ChromaDB, Embeddings, LangChain
-
-### Lecture (1.5 hours)
-- [PDF](pdf/week14-rag-vector-db-lecture.pdf) | [HTML](html/week14-rag-vector-db-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week14-rag-vector-db-lecture.md)
-- Content: RAG architecture, vector search fundamentals, embedding models, building a "Chat with PDF" system.
-
-### Lab (3 hours)
-- [PDF](pdf/week14-rag-vector-db-lab.pdf) | [HTML](html/week14-rag-vector-db-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week14-rag-vector-db-lab.md)
-- Exercises: PDF ingestion pipeline, setting up ChromaDB, integrating retrieval with Gemini/OpenAI API.
-
----
-
-## Week 15: Cloud Foundations & Orchestration
-
-**Topics**: Docker Compose, Cloud Providers (AWS/Render), Infrastructure as Code
-
-### Lecture (1.5 hours)
-- [PDF](pdf/week15-cloud-orchestration-lecture.pdf) | [HTML](html/week15-cloud-orchestration-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week15-cloud-orchestration-lecture.md)
-- Content: Multi-container orchestration with Docker Compose, cloud deployment models (PaaS vs IaaS), secrets management.
-
-### Lab (3 hours)
-- [PDF](pdf/week15-cloud-orchestration-lab.pdf) | [HTML](html/week15-cloud-orchestration-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week15-cloud-orchestration-lab.md)
-- Exercises: Writing docker-compose.yml, deploying a full-stack AI app to the cloud (Render/AWS).
-
----
-
-## Week 16: Model Monitoring & Observability
+## Week 14: Model Monitoring & Observability
 
 **Topics**: Data Drift, Concept Drift, Evidently AI, Prometheus
 
 ### Lecture (1.5 hours)
-- [PDF](pdf/week16-model-monitoring-lecture.pdf) | [HTML](html/week16-model-monitoring-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week16-model-monitoring-lecture.md)
+- [PDF](pdf/week14-model-monitoring-lecture.pdf) | [HTML](html/week14-model-monitoring-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week14-model-monitoring-lecture.md)
 - Content: Detecting silent model failures, statistical drift tests (KS test), monitoring dashboards with Evidently AI.
 
 ### Lab (3 hours)
-- [PDF](pdf/week16-model-monitoring-lab.pdf) | [HTML](html/week16-model-monitoring-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week16-model-monitoring-lab.md)
+- [PDF](pdf/week14-model-monitoring-lab.pdf) | [HTML](html/week14-model-monitoring-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week14-model-monitoring-lab.md)
 - Exercises: Simulating production data drift, generating drift reports, setting up alerts.
 
 ---
 
-## Week 17: LLM Agents & Tool Use
+## Week 15: Course Summary & Future Trends
 
-**Topics**: Agents, Function Calling, ReAct Pattern, LangGraph
+**Topics**: Review of the ML pipeline, LLOps, Agents, Edge AI, Final Projects
 
 ### Lecture (1.5 hours)
-- [PDF](pdf/week17-llm-agents-lecture.pdf) | [HTML](html/week17-llm-agents-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week17-llm-agents-lecture.md)
-- Content: From chatbots to agents, tool use/function calling, building autonomous research agents with LangGraph.
-
-### Lab (3 hours)
-- [PDF](pdf/week17-llm-agents-lab.pdf) | [HTML](html/week17-llm-agents-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week17-llm-agents-lab.md)
-- Exercises: Building a multi-step research agent, implementing custom tools.
+- [PDF](pdf/week15-course-summary-lecture.pdf) | [HTML](html/week15-course-summary-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week15-course-summary-lecture.md)
+- Content: Recap of Weeks 1-14, advanced topics (LLM Ops, Agents), final project ideas, and the future of AI engineering.
 
 ---
 
