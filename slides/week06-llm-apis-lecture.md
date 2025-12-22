@@ -10,7 +10,7 @@ style: @import "custom.css";
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-# Week 3: LLM APIs & Prompt Engineering
+# Week 6: LLM APIs & Prompt Engineering
 
 **CS 203: Software Tools and Techniques for AI**
 
