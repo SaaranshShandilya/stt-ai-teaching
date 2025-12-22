@@ -13,7 +13,7 @@ This repository contains the lecture slides, lab exercises, and course materials
 | 1 | Data Collection | Chrome DevTools, Playwright, BeautifulSoup |
 | 2 | Data Validation & Quality | Pydantic, jq, pandas |
 | 3 | Data Labeling & Annotation | Label Studio, Cohen's Kappa |
-| 4 | Active Learning | modAL, Uncertainty Sampling |
+| 4 | Optimizing Labeling | modAL, Snorkel, cleanlab, LLM APIs |
 | 5 | Data Augmentation | Albumentations, nlpaug |
 | 6 | LLM APIs & Multimodal AI | Gemini API, OpenAI API |
 | 7 | Model Development & Training | Scikit-learn, AutoGluon, PyTorch, LLM Fine-tuning |

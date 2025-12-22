@@ -17,7 +17,7 @@ This 15-week course covers the complete software engineering stack for modern AI
 ## Quick Navigation
 
 - [Week 1: Data Collection](#week-1-data-collection) | [Week 2: Data Validation](#week-2-data-validation-quality) | [Week 3: Data Labeling](#week-3-data-labeling-annotation)
-- [Week 4: Active Learning](#week-4-active-learning) | [Week 5: Data Augmentation](#week-5-data-augmentation) | [Week 6: LLM APIs](#week-6-llm-apis-multimodal-ai)
+- [Week 4: Optimizing Labeling](#week-4-optimizing-labeling) | [Week 5: Data Augmentation](#week-5-data-augmentation) | [Week 6: LLM APIs](#week-6-llm-apis-multimodal-ai)
 - [Week 7: Model Development](#week-7-model-development-training) | [Week 8: Reproducibility](#week-8-reproducibility-environments) | [Week 9: Interactive Demos](#week-9-interactive-ai-demos)
 - [Week 10: HTTP & APIs](#week-10-http-apis-fastapi) | [Week 11: Git & CI/CD](#week-11-git-github-actions-cicd) | [Week 12: Edge Deployment](#week-12-deployment-on-constrained-devices)
 - [Week 13: Profiling](#week-13-profiling-optimization) | [Week 14: Monitoring](#week-14-model-monitoring-observability) | [Week 15: Summary](#week-15-course-summary-future-trends)
@@ -65,14 +65,14 @@ Set up annotation workflows and measure inter-annotator agreement.
 
 ---
 
-### Week 4: Active Learning
+### Week 4: Optimizing Labeling
 
-Reduce labeling costs using intelligent query strategies.
+Reduce labeling costs using active learning, weak supervision, and LLM-based labeling.
 
-**Key Tools:** modAL, scikit-learn
+**Key Tools:** modAL, Snorkel, cleanlab, Gemini API
 
-- **Lecture** ([PDF](pdf/week04-active-learning-lecture.pdf) | [HTML](html/week04-active-learning-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week04-active-learning-lecture.md))
-  - Uncertainty sampling, Query-by-committee, Learning curves
+- **Lecture** ([PDF](pdf/week04-optimizing-labeling-lecture.pdf) | [HTML](html/week04-optimizing-labeling-lecture.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week04-optimizing-labeling-lecture.md))
+  - Active learning, Weak supervision, LLM-based labeling, Noisy label handling
 - **Lab** ([PDF](pdf/week04-active-learning-lab.pdf) | [HTML](html/week04-active-learning-lab.html) | [Source](https://github.com/nipunbatra/stt-ai-teaching/blob/master/slides/week04-active-learning-lab.md))
   - Implement active learning strategies, Compare cost savings
 
