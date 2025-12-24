@@ -2,1438 +2,786 @@
 marp: true
 theme: default
 paginate: true
-style: @import "custom.css";
-  section { justify-content: flex-start; }
+backgroundColor: #fff
 ---
 
 <!-- _class: lead -->
-<!-- _paginate: false -->
 
-# Reproducibility & Environments
+# Week 8: Reproducibility & Environments
 
 **CS 203: Software Tools and Techniques for AI**
-Prof. Nipun Batra, IIT Gandhinagar
+
+Prof. Nipun Batra
+IIT Gandhinagar
 
 ---
 
-# The Reproducibility Crisis
+# The "Works on My Machine" Problem
 
-**"It works on my machine!"**
+You built a Netflix movie predictor. It works great on your laptop.
 
-**Common scenarios:**
-- Research paper: "We achieved 95% accuracy"
-- You: Run their code → 73% accuracy (or crash)
-- Collaborator: "I can't install your dependencies"
-- 6 months later: You can't run your own code
+**Your friend tries to run it:**
 
-**Root causes:**
-- Different Python versions
-- Missing dependencies
-- OS-specific issues
-- Hardware differences
-- Random seeds not set
-
----
-
-# What is Reproducibility?
-
-**Reproducibility**: Ability to obtain same results using same code and data
-
-**Levels:**
-
-1. **Computational Reproducibility**: Same code + data = same results
-2. **Statistical Reproducibility**: Control for randomness
-3. **Scientific Reproducibility**: Independent verification
-
-**Why it matters:**
-- Scientific integrity
-- Collaboration
-- Debugging
-- Deployment
-- Future you will thank present you
-
----
-
-# Environment Management
-
-**The Problem:**
 ```
-Project A: Python 3.8, TensorFlow 2.4
-Project B: Python 3.10, TensorFlow 2.12
-System: Python 3.9, TensorFlow 2.8
+ImportError: No module named 'sklearn'
 ```
 
-**Solution**: Isolated environments
+**You say:** "Just pip install sklearn"
 
-**Tools:**
-- **venv/virtualenv**: Python virtual environments
-- **conda**: Package and environment manager
-- **Poetry**: Modern dependency management
-- **Docker**: OS-level isolation
+```
+ERROR: Could not find a version that satisfies the requirement sklearn
+```
+
+**3 hours later:** Still debugging Python versions, missing dependencies...
+
+**Sound familiar?**
 
 ---
 
-# Python Virtual Environments (venv)
+# Why Reproducibility Matters
 
-**Create isolated Python environments**
+**For you:**
+- 6 months later, you can still run your own code
+- Switch laptops without days of setup
+- Debug issues consistently
+
+**For collaboration:**
+- Teammates can run your code immediately
+- No more "but it works for me!"
+- Onboard new team members quickly
+
+**For science:**
+- Others can verify your results
+- Build on your work
+- Trust in research
+
+---
+
+# Connection to Our Netflix Project
+
+```
+Week 1-7: Built a movie success predictor
+          ↓
+Week 8:   Make it reproducible!
+          - Anyone can run your code
+          - Same results every time
+          - Works on any machine
+```
+
+**Goal:** Package our Netflix project so anyone can use it.
+
+---
+
+<!-- _class: lead -->
+
+# Part 1: Virtual Environments
+
+*Keeping projects separate*
+
+---
+
+# The Problem: Dependency Conflicts
+
+**Scenario:**
+
+| Project | Python | TensorFlow | NumPy |
+|---------|--------|------------|-------|
+| Netflix Predictor | 3.10 | 2.12 | 1.24 |
+| Old School Project | 3.8 | 1.15 | 1.19 |
+| Your System | 3.11 | ??? | ??? |
+
+**Can't install both TensorFlow versions on the same system!**
+
+**Solution:** Give each project its own isolated environment.
+
+---
+
+# Virtual Environments: The Concept
+
+Think of it like separate rooms in a house:
+
+```
+Your Computer
+├── Project A's Room
+│   └── Python 3.10, TensorFlow 2.12, NumPy 1.24
+│
+├── Project B's Room
+│   └── Python 3.8, TensorFlow 1.15, NumPy 1.19
+│
+└── Living Room (system Python)
+    └── Python 3.11 (don't touch this!)
+```
+
+Each room has its own stuff. No conflicts!
+
+---
+
+# Creating a Virtual Environment
+
+**Step 1:** Create the environment
 
 ```bash
-# Create virtual environment
-python -m venv myenv
+python -m venv netflix_env
+```
 
-# Activate (Linux/Mac)
-source myenv/bin/activate
+**Step 2:** Activate it
 
-# Activate (Windows)
-myenv\Scripts\activate
+```bash
+# Mac/Linux
+source netflix_env/bin/activate
 
-# Install packages
-pip install numpy pandas scikit-learn
+# Windows
+netflix_env\Scripts\activate
+```
 
-# Save dependencies
-pip freeze > requirements.txt
+**Step 3:** Your prompt changes
 
-# Deactivate
+```bash
+(netflix_env) $ python --version
+Python 3.10.12
+```
+
+Now you're in the Netflix room!
+
+---
+
+# Installing Packages in Your Environment
+
+**With the environment activated:**
+
+```bash
+# Install what you need
+pip install pandas scikit-learn matplotlib
+
+# Check what's installed
+pip list
+
+# When done, deactivate
 deactivate
 ```
 
-**Benefits:** Simple, built-in, lightweight
+**Key insight:** Packages only install in the active environment.
+
+Your system Python stays clean!
 
 ---
 
-# requirements.txt
+# requirements.txt: Your Shopping List
 
-**Standard way to specify dependencies**
+**Save your dependencies:**
+
+```bash
+pip freeze > requirements.txt
+```
+
+**What it creates:**
 
 ```txt
 numpy==1.24.3
 pandas==2.0.2
 scikit-learn==1.2.2
 matplotlib==3.7.1
-torch==2.0.1
 ```
 
-**Install from requirements.txt:**
+**Anyone can now install exactly what you have:**
+
 ```bash
 pip install -r requirements.txt
 ```
 
-**Best practices:**
-- Pin versions (==) for reproducibility
-- Use >= for flexibility
-- Separate dev dependencies
-- Include Python version in README
+---
+
+# Good vs Bad requirements.txt
+
+**Good (pinned versions):**
+
+```txt
+numpy==1.24.3
+pandas==2.0.2
+scikit-learn==1.2.2
+```
+
+**Bad (unpinned):**
+
+```txt
+numpy
+pandas
+scikit-learn
+```
+
+**Why?** Tomorrow, scikit-learn 2.0 releases with breaking changes. Your code breaks for new users, but not for you.
+
+**Pin your versions for reproducibility!**
 
 ---
 
-# Conda Environments
+# Conda: An Alternative
 
-**More powerful than venv, handles non-Python dependencies**
+**Conda** is popular in data science. It can manage:
+- Python versions (not just packages)
+- Non-Python dependencies (CUDA, C libraries)
 
 ```bash
-# Create environment with specific Python version
-conda create -n myenv python=3.10
+# Create environment with specific Python
+conda create -n netflix python=3.10
 
 # Activate
-conda activate myenv
+conda activate netflix
 
 # Install packages
-conda install numpy pandas scikit-learn
-
-# Install from conda-forge
-conda install -c conda-forge librosa
+conda install pandas scikit-learn
 
 # Export environment
 conda env export > environment.yml
 
-# Create from YAML
+# Create from file
 conda env create -f environment.yml
-
-# Deactivate
-conda deactivate
 ```
 
 ---
 
-# environment.yml
+# venv vs Conda: Which to Use?
 
-**Conda environment specification**
+| Feature | venv | Conda |
+|---------|------|-------|
+| Built into Python | Yes | No (install separately) |
+| Manage Python versions | No | Yes |
+| Non-Python packages | No | Yes (CUDA, etc.) |
+| Speed | Fast | Slower |
+| File | requirements.txt | environment.yml |
 
-```yaml
-name: ml-project
-channels:
-  - pytorch
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.10
-  - numpy=1.24
-  - pandas=2.0
-  - pytorch=2.0
-  - cudatoolkit=11.8
-  - pip
-  - pip:
-    - transformers==4.30.0
-    - wandb==0.15.0
-```
+**Recommendation for this course:** Start with venv (simpler).
 
-**Advantages:**
-- Specify channels
-- Mix conda and pip packages
-- Include Python version
+Use Conda when you need GPU/CUDA setup.
 
 ---
 
-# Poetry: Modern Dependency Management
+<!-- _class: lead -->
 
-**Handles dependencies, virtual environments, and packaging**
+# Part 2: Random Seeds
 
-```bash
-# Install Poetry
-curl -sSL https://install.python-poetry.org | python3 -
-
-# Initialize project
-poetry init
-
-# Add dependencies
-poetry add numpy pandas scikit-learn
-
-# Add dev dependencies
-poetry add --group dev pytest black
-
-# Install all dependencies
-poetry install
-
-# Run command in environment
-poetry run python train.py
-
-# Build package
-poetry build
-```
+*Getting the same results every time*
 
 ---
 
-# pyproject.toml (Poetry)
+# The Randomness Problem
 
-```toml
-[tool.poetry]
-name = "ml-project"
-version = "0.1.0"
-description = "My ML project"
-authors = ["Your Name <you@example.com>"]
+Run your Netflix model training twice:
 
-[tool.poetry.dependencies]
-python = "^3.10"
-numpy = "^1.24"
-pandas = "^2.0"
-scikit-learn = "^1.2"
-torch = "^2.0"
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.3"
-black = "^23.3"
-mypy = "^1.3"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
 ```
+
+**Run 1:** 0.82
+**Run 2:** 0.79
+**Run 3:** 0.84
+
+**Which result do you report?**
+
+---
+
+# What's Random in ML?
+
+Many operations use random numbers:
+
+1. **Train/test split** - which samples go where?
+2. **Model initialization** - starting weights
+3. **Shuffling data** - order during training
+4. **Dropout** - which neurons to drop
+5. **Data augmentation** - random transformations
+
+**Without control:** Different results every run.
 
 ---
 
 # Setting Random Seeds
 
-**Ensure reproducible results**
+**Simple fix:** Tell Python what random numbers to use.
 
 ```python
 import random
 import numpy as np
-import torch
+from sklearn.model_selection import train_test_split
 
-def set_seed(seed=42):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
+# Set the seed ONCE at the start
+random.seed(42)
+np.random.seed(42)
 
-    # Make CUDA deterministic
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
-# Set at start of script
-set_seed(42)
-
-# Now your code is reproducible
+# Now this split is reproducible
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, random_state=42
+)
 ```
 
-**Note**: Some operations still non-deterministic on GPU
+**Run it 100 times → Same split every time!**
 
 ---
 
-# What is Docker?
+# A Complete Seed Function
 
-**Containerization platform: Package code + dependencies + OS**
+```python
+import random
+import numpy as np
 
-**Container vs VM:**
+def set_seed(seed=42):
+    """Set all random seeds for reproducibility."""
+    random.seed(seed)
+    np.random.seed(seed)
 
-| Container | Virtual Machine |
-|-----------|----------------|
-| Lightweight (MB) | Heavy (GB) |
-| Fast startup (seconds) | Slow startup (minutes) |
-| Shares host kernel | Full OS |
-| Less isolation | More isolation |
+    # If using PyTorch
+    try:
+        import torch
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    except ImportError:
+        pass
 
-**Benefits:**
-- Works identically everywhere
-- No "works on my machine" problems
-- Easy to share and deploy
-- Reproducible environments
+# Call at the start of every script
+set_seed(42)
+```
+
+**Why 42?** It's a tradition (Hitchhiker's Guide to the Galaxy).
+
+Any number works!
 
 ---
 
-# Docker Architecture
+# Don't Forget random_state!
 
-**Key concepts:**
+Many sklearn functions have a `random_state` parameter:
 
-- **Image**: Template for containers (like a class)
-- **Container**: Running instance (like an object)
-- **Dockerfile**: Instructions to build image
-- **Registry**: Store images (Docker Hub, GitHub Container Registry)
+```python
+# Train/test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Random Forest
+model = RandomForestClassifier(
+    n_estimators=100, random_state=42
+)
+
+# Cross-validation with shuffling
+cross_val_score(model, X, y, cv=5, random_state=42)  # ❌ No!
+
+# Use a fixed KFold instead
+from sklearn.model_selection import KFold
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+cross_val_score(model, X, y, cv=kf)  # ✓ Yes!
+```
+
+---
+
+<!-- _class: lead -->
+
+# Part 3: Docker Basics
+
+*"Works on my machine" → "Works on EVERY machine"*
+
+---
+
+# Virtual Environments Aren't Enough
+
+**Scenario:** You share your requirements.txt, but...
+
+- Friend has different OS (Windows vs Mac vs Linux)
+- System libraries differ
+- CUDA versions conflict
+- Even PATH configurations vary
+
+**Virtual environments isolate Python, not the whole system.**
+
+---
+
+# Docker: Package Everything
+
+**Docker** creates a container with:
+- Operating system
+- Python version
+- All libraries
+- Your code
+- Configuration
+
+**It's like shipping your entire laptop to someone!**
+
+```
+Your Code + Python + Linux + Everything
+            ↓
+        Container
+            ↓
+    Runs identically everywhere
+```
+
+---
+
+# Docker Concepts
+
+| Term | What It Is | Analogy |
+|------|------------|---------|
+| **Image** | Blueprint/template | Recipe |
+| **Container** | Running instance | Cooked dish |
+| **Dockerfile** | Instructions to build image | Recipe card |
+| **Registry** | Store for images | Recipe book |
 
 **Workflow:**
+
 ```
 Dockerfile → (build) → Image → (run) → Container
 ```
 
 ---
 
-# Dockerfile Basics
+# Your First Dockerfile
 
-**Create `Dockerfile`:**
+Create a file named `Dockerfile` (no extension):
 
 ```dockerfile
-# Start from base image
+# Start from a Python image
 FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy requirements
+# Copy requirements first (for caching)
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Copy project files
+# Copy your code
 COPY . .
 
-# Set environment variable
-ENV PYTHONUNBUFFERED=1
-
-# Run command
+# Command to run
 CMD ["python", "train.py"]
 ```
 
 ---
 
-# Building and Running Docker Images
+# Building and Running
 
-**Build image:**
-```bash
-docker build -t my-ml-project:v1 .
-```
-
-**Run container:**
-```bash
-# Basic run
-docker run my-ml-project:v1
-
-# Interactive mode
-docker run -it my-ml-project:v1 /bin/bash
-
-# Mount volume (share files)
-docker run -v $(pwd)/data:/app/data my-ml-project:v1
-
-# Expose port (for APIs)
-docker run -p 8000:8000 my-ml-project:v1
-
-# Run with GPU
-docker run --gpus all my-ml-project:v1
-```
-
----
-
-# Dockerfile for ML Projects: Key Structure
-
-**Essential Dockerfile components**:
-
-```dockerfile
-# 1. Base image
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
-
-# 2. Working directory
-WORKDIR /app
-
-# 3. Install dependencies (cached layer)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 4. Copy application code (changes frequently)
-COPY . .
-
-# 5. Run command
-CMD ["python", "train.py"]
-```
-
-**Key insight**: Order matters for caching! Dependencies change less than code.
-
----
-
-# Dockerfile for ML Projects: Complete Example
-
-```dockerfile
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
-
-WORKDIR /app
-
-# System dependencies
-RUN apt-get update && apt-get install -y git wget \
-    && rm -rf /var/lib/apt/lists/*
-
-# Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Application code
-COPY . .
-
-# Setup
-RUN mkdir -p /app/data /app/models /app/outputs
-ENV PYTHONPATH=/app
-
-CMD ["python", "train.py"]
-```
-
----
-
-# Docker Compose
-
-**Manage multi-container applications**
-
-Create `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  ml-training:
-    build: .
-    volumes:
-      - ./data:/app/data
-      - ./models:/app/models
-    environment:
-      - CUDA_VISIBLE_DEVICES=0
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  api:
-    image: my-api:latest
-    ports:
-      - "8000:8000"
-    depends_on:
-      - ml-training
-```
-
----
-
-# Using Docker Compose
+**Build the image:**
 
 ```bash
-# Start all services
-docker-compose up
-
-# Start in background
-docker-compose up -d
-
-# Stop services
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Run specific service
-docker-compose run ml-training python train.py
-
-# Rebuild images
-docker-compose build
+docker build -t netflix-predictor .
 ```
 
----
-
-# Multi-Stage Docker Builds: Concept
-
-**Problem**: Build tools bloat the final image
-
-**Solution**: Build in one stage, run in another
-
-**Benefits**:
-- Final image only contains runtime dependencies
-- Typical savings: 500MB → 200MB (60% reduction)
-- More secure (fewer tools = smaller attack surface)
-
----
-
-# Multi-Stage Docker Builds: Implementation
-
-```dockerfile
-# Stage 1: Build (includes build tools)
-FROM python:3.10 AS builder
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --user -r requirements.txt
-
-# Stage 2: Runtime (slim base, no build tools)
-FROM python:3.10-slim
-WORKDIR /app
-
-# Copy ONLY the installed packages, not the build tools
-COPY --from=builder /root/.local /root/.local
-COPY . .
-
-ENV PATH=/root/.local/bin:$PATH
-CMD ["python", "app.py"]
-```
-
-**Key**: `COPY --from=builder` pulls artifacts from stage 1
-
----
-
-# Docker Best Practices
-
-**1. Use specific base images**
-```dockerfile
-# Good
-FROM python:3.10-slim
-
-# Avoid
-FROM python:latest
-```
-
-**2. Minimize layers**
-```dockerfile
-# Good: Single RUN
-RUN apt-get update && apt-get install -y \
-    package1 package2 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Bad: Multiple RUNs
-RUN apt-get update
-RUN apt-get install -y package1
-RUN apt-get install -y package2
-```
-
-**3. Use .dockerignore**
-**4. Don't run as root**
-**5. Use multi-stage builds**
-
----
-
-# .dockerignore
-
-**Exclude files from Docker context**
-
-```
-# .dockerignore
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-*.egg
-*.egg-info
-dist
-build
-.git
-.gitignore
-.vscode
-.idea
-*.ipynb_checkpoints
-data/
-models/*.pth
-*.log
-.env
-```
-
----
-
-# Version Control for ML
-
-**Git + DVC (Data Version Control)**
-
-**Problem**: Git doesn't handle large files well
-
-**DVC**: Version control for data and models
+**Run it:**
 
 ```bash
-# Initialize DVC
-dvc init
-
-# Track large file
-dvc add data/large_dataset.csv
-
-# Commit
-git add data/large_dataset.csv.dvc .gitignore
-git commit -m "Add dataset"
-
-# Push data to remote storage (S3, GCS, etc.)
-dvc remote add -d myremote s3://mybucket/dvc-storage
-dvc push
-
-# Pull data
-dvc pull
+docker run netflix-predictor
 ```
+
+**That's it!** Your code runs in an isolated container.
+
+Works on any machine with Docker installed.
 
 ---
 
-# DVC Pipeline
-
-**Define reproducible ML pipelines**
-
-```yaml
-# dvc.yaml
-stages:
-  prepare:
-    cmd: python prepare.py
-    deps:
-      - prepare.py
-      - data/raw
-    outs:
-      - data/processed
-
-  train:
-    cmd: python train.py
-    deps:
-      - train.py
-      - data/processed
-    params:
-      - train.learning_rate
-      - train.epochs
-    outs:
-      - models/model.pkl
-    metrics:
-      - metrics.json:
-          cache: false
-```
-
----
-
-# Running DVC Pipelines
+# Common Docker Commands
 
 ```bash
-# Reproduce pipeline
-dvc repro
+# Build image
+docker build -t myapp .
 
-# Visualize pipeline
-dvc dag
+# Run container
+docker run myapp
 
-# Compare experiments
-dvc params diff
+# Run interactively (get a shell)
+docker run -it myapp /bin/bash
 
-# Track metrics
-dvc metrics show
+# Share files between host and container
+docker run -v $(pwd)/data:/app/data myapp
 
-# Create experiment
-dvc exp run
+# See running containers
+docker ps
 
-# Compare experiments
-dvc exp diff
+# Stop a container
+docker stop <container_id>
 ```
 
 ---
 
-# MLflow for Experiment Tracking
-
-**Track experiments, models, and parameters**
-
-```python
-import mlflow
-import mlflow.sklearn
-
-# Start tracking
-mlflow.set_tracking_uri("http://localhost:5000")
-mlflow.set_experiment("my-experiment")
-
-with mlflow.start_run():
-    # Log parameters
-    mlflow.log_param("learning_rate", 0.01)
-    mlflow.log_param("epochs", 100)
-
-    # Train model
-    model = train_model()
-
-    # Log metrics
-    mlflow.log_metric("accuracy", 0.95)
-    mlflow.log_metric("loss", 0.05)
-
-    # Log model
-    mlflow.sklearn.log_model(model, "model")
-
-    # Log artifacts
-    mlflow.log_artifact("plots/confusion_matrix.png")
-```
-
----
-
-# MLflow UI
-
-```bash
-# Start MLflow server
-mlflow ui --host 0.0.0.0 --port 5000
-
-# Access at http://localhost:5000
-```
-
-**Features:**
-- Compare experiment runs
-- Visualize metrics
-- Download models and artifacts
-- Search and filter experiments
-- Deploy models
-
----
-
-# Weights & Biases (wandb)
-
-**Modern experiment tracking and collaboration**
-
-```python
-import wandb
-
-# Initialize
-wandb.init(
-    project="my-project",
-    config={
-        "learning_rate": 0.01,
-        "epochs": 100,
-        "batch_size": 32
-    }
-)
-
-# Log metrics during training
-for epoch in range(epochs):
-    train_loss = train_epoch()
-    val_loss = validate()
-
-    wandb.log({
-        "epoch": epoch,
-        "train_loss": train_loss,
-        "val_loss": val_loss
-    })
-
-# Log media
-wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(...)})
-
-# Finish
-wandb.finish()
-```
-
----
-
-# Configuration Management
-
-**Use config files instead of hardcoding**
-
-**1. YAML/JSON configs:**
-```yaml
-# config.yaml
-model:
-  name: "resnet50"
-  pretrained: true
-
-training:
-  batch_size: 32
-  learning_rate: 0.001
-  epochs: 100
-  device: "cuda"
-
-data:
-  train_path: "data/train"
-  val_path: "data/val"
-  num_workers: 4
-```
-
----
-
-# Loading Configs
-
-```python
-import yaml
-from dataclasses import dataclass
-
-@dataclass
-class TrainingConfig:
-    batch_size: int
-    learning_rate: float
-    epochs: int
-    device: str
-
-def load_config(config_path):
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-
-    training_config = TrainingConfig(**config['training'])
-    return training_config
-
-# Usage
-config = load_config('config.yaml')
-print(config.learning_rate)
-```
-
----
-
-# Hydra for Configuration
-
-**Powerful configuration management**
-
-```python
-import hydra
-from omegaconf import DictConfig
-
-@hydra.main(config_path="configs", config_name="config", version_base=None)
-def train(cfg: DictConfig):
-    print(f"Learning rate: {cfg.training.learning_rate}")
-    print(f"Batch size: {cfg.training.batch_size}")
-
-    # Access nested config
-    model = build_model(cfg.model)
-    train_model(model, cfg.training)
-
-if __name__ == "__main__":
-    train()
-```
-
-**Run with overrides:**
-```bash
-python train.py training.learning_rate=0.01 training.epochs=50
-```
-
----
-
-# Environment Variables
-
-**Store secrets and config**
-
-**Create `.env` file:**
-```
-API_KEY=your_secret_key
-DATABASE_URL=postgresql://localhost/db
-MODEL_PATH=/path/to/models
-DEBUG=True
-```
-
-**Load in Python:**
-```python
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-api_key = os.getenv("API_KEY")
-db_url = os.getenv("DATABASE_URL")
-debug = os.getenv("DEBUG", "False") == "True"
-```
-
-**Important:** Add `.env` to `.gitignore`!
-
----
-
-# Logging Best Practices
-
-**Structured logging for debugging**
-
-```python
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('training.log'),
-        logging.StreamHandler()
-    ]
-)
-
-logger = logging.getLogger(__name__)
-
-# Use throughout code
-logger.info("Starting training")
-logger.debug(f"Batch size: {batch_size}")
-logger.warning("Learning rate is very high")
-logger.error("Failed to load checkpoint")
-
-try:
-    load_model()
-except Exception as e:
-    logger.exception("Error loading model")
-```
-
----
-
-# Model Checkpointing
-
-**Save model state regularly**
-
-```python
-import torch
-
-def save_checkpoint(model, optimizer, epoch, loss, path):
-    checkpoint = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss,
-        'config': config
-    }
-    torch.save(checkpoint, path)
-    logger.info(f"Checkpoint saved to {path}")
-
-def load_checkpoint(model, optimizer, path):
-    checkpoint = torch.load(path)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    epoch = checkpoint['epoch']
-    loss = checkpoint['loss']
-    return model, optimizer, epoch, loss
-
-# Save every N epochs
-if epoch % 10 == 0:
-    save_checkpoint(model, optimizer, epoch, loss,
-                   f'checkpoints/model_epoch_{epoch}.pth')
-```
-
----
-
-# Project Structure: Key Components
-
-**Organize your ML project for reproducibility:**
-
-| Directory | Purpose |
-|-----------|---------|
-| `data/` | Raw, processed, and external data |
-| `models/` | Trained model checkpoints |
-| `notebooks/` | Exploratory analysis |
-| `src/` | Source code (data, models, utils) |
-| `tests/` | Unit and integration tests |
-| `configs/` | Configuration files |
-
-**Key files**: `requirements.txt`, `Dockerfile`, `README.md`, `.gitignore`
-
-**Principle**: Separate code, data, config, and outputs
-
----
-
-# Project Structure: Full Layout
-
-```
-ml-project/
-├── data/
-│   ├── raw/           # Original, immutable data
-│   ├── processed/     # Cleaned, transformed data
-│   └── external/      # Data from third parties
-├── models/
-│   └── trained/       # Model checkpoints
-├── notebooks/         # Jupyter notebooks
-├── src/               # Source code
-│   ├── data/          # Data loading, preprocessing
-│   ├── models/        # Model definitions
-│   └── utils/         # Helper functions
-├── tests/             # pytest tests
-├── configs/           # YAML/JSON configs
-├── requirements.txt   # Python dependencies
-├── Dockerfile         # Container definition
-├── README.md          # Documentation
-└── .gitignore         # Ignore data/models in git
-```
-
----
-
-# Reproducibility Checklist
-
-**Before sharing code:**
-
-- [ ] Pin all dependency versions
-- [ ] Set random seeds
-- [ ] Document Python version
-- [ ] Include requirements.txt or environment.yml
-- [ ] Provide Docker setup (Dockerfile)
-- [ ] Document data sources
-- [ ] Include sample data or download scripts
-- [ ] Write clear README with setup instructions
-- [ ] Test on clean environment
-- [ ] Document hardware requirements (GPU, RAM)
-- [ ] Include configuration files
-- [ ] Version control with Git
-
----
-
-# README Template
-
-```markdown
-# Project Name
-
-## Setup
-
-### Requirements
-- Python 3.10+
-- CUDA 11.7 (for GPU support)
-- 16GB RAM minimum
-
-### Installation
-
-1. Clone repository
-   \`\`\`bash
-   git clone https://github.com/user/project.git
-   cd project
-   \`\`\`
-
-2. Create virtual environment
-   \`\`\`bash
-   python -m venv venv
-   source venv/bin/activate
-   \`\`\`
-
-3. Install dependencies
-   \`\`\`bash
-   pip install -r requirements.txt
-   \`\`\`
-
-4. Download data
-   \`\`\`bash
-   python scripts/download_data.py
-   \`\`\`
-
-## Usage
-
-Train model:
-\`\`\`bash
-python train.py --config configs/config.yaml
-\`\`\`
-
-## Docker
-
-\`\`\`bash
-docker build -t myproject .
-docker run -v $(pwd)/data:/app/data myproject
-\`\`\`
-```
-
----
-
-# Continuous Integration for ML
-
-**Automate testing and validation**
-
-**`.github/workflows/train.yml`:**
-
-```yaml
-name: Train Model
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  train:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.10
-
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-
-    - name: Run training
-      run: |
-        python train.py --epochs 5
-
-    - name: Upload metrics
-      uses: actions/upload-artifact@v2
-      with:
-        name: metrics
-        path: metrics.json
-```
-
----
-
-# Model Cards
-
-**Document model details**
-
-```markdown
-# Model Card: Sentiment Classifier
-
-## Model Details
-- **Model type**: DistilBERT
-- **Version**: 1.0
-- **Date**: 2025-12-08
-
-## Intended Use
-- **Primary use**: Sentiment analysis of product reviews
-- **Out-of-scope**: Political content, medical text
-
-## Training Data
-- **Dataset**: Amazon reviews (100k samples)
-- **Splits**: 80/10/10 (train/val/test)
-- **Preprocessing**: Lowercase, remove URLs
-
-## Performance
-- **Test Accuracy**: 92%
-- **F1 Score**: 0.91
-
-## Limitations
-- Struggles with sarcasm
-- Biased toward longer reviews
-
-## Ethical Considerations
-- May amplify existing biases in training data
-```
-
----
-
-# What We've Learned
-
-**Environment Management:**
-- venv, conda, Poetry for Python environments
-- requirements.txt, environment.yml, pyproject.toml
-
-**Containerization:**
-- Docker for reproducible environments
-- Dockerfile, docker-compose
-- Multi-stage builds
-
-**Version Control:**
-- Git for code
-- DVC for data and models
-
-**Experiment Tracking:**
-- MLflow and Weights & Biases
-- Configuration management
-- Logging and checkpointing
-
-**Best Practices:**
-- Project structure
-- Documentation
-- Reproducibility checklist
-
----
-
-# Deterministic Training in PyTorch
-
-**Problem**: GPUs use non-deterministic algorithms by default.
-
-**Full Determinism**:
-```python
-import torch
-import numpy as np
-import random
-
-def set_seed(seed=42):
-    """Set all random seeds for reproducibility."""
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-    # Deterministic algorithms
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
-    # For CUDA >= 10.2
-    torch.use_deterministic_algorithms(True)
-
-set_seed(42)
-```
-
-**Tradeoffs**:
-- **Deterministic = True**: Slower but reproducible
-- **Benchmark = True**: Faster but non-deterministic
-
-**When to use**: Research, debugging. Disable in production for speed.
-
----
-
-# Handling Non-Deterministic Operations
-
-**Some operations are inherently non-deterministic on GPU:**
-
-**Atomic adds** (scatter, index_add):
-```python
-# Solution: Use deterministic scatter
-torch.use_deterministic_algorithms(True, warn_only=True)
-```
-
-**Data loading randomness**:
-```python
-def worker_init_fn(worker_id):
-    """Set seed per worker."""
-    np.random.seed(42 + worker_id)
-    random.seed(42 + worker_id)
-
-dataloader = DataLoader(
-    dataset,
-    batch_size=32,
-    shuffle=True,
-    worker_init_fn=worker_init_fn,
-    generator=torch.Generator().manual_seed(42)
-)
-```
-
----
-
-# Hash-Based Reproducibility
-
-**Content-Addressed Storage**: Use hash of data/code, not timestamps.
-
-**DVC uses content addressing**:
-```bash
-# Data is identified by MD5 hash
-$ dvc add data/train.csv
-# Creates: data/train.csv.dvc with hash
-
-# Track changes
-$ git add data/train.csv.dvc
-$ git commit -m "Update training data"
-
-# Anyone can retrieve exact version
-$ dvc pull
-```
-
-**Benefits**:
-- Detect silent data changes
-- Ensure exact data version
-- Cache deduplication
-
----
-
-# Semantic Versioning for ML
-
-**Code versioning**: Git tags (v1.2.3)
-
-**Data versioning**: DVC tags
-
-**Model versioning**:
-```python
-# model_registry.py
-class ModelVersion:
-    def __init__(self, major, minor, patch):
-        self.version = f"{major}.{minor}.{patch}"
-        self.code_commit = get_git_commit()
-        self.data_version = get_dvc_version()
-        self.config = load_config()
-        self.metrics = {}
-
-    def save(self, path):
-        metadata = {
-            'version': self.version,
-            'code_commit': self.code_commit,
-            'data_version': self.data_version,
-            'config': self.config,
-            'metrics': self.metrics,
-            'timestamp': datetime.now().isoformat()
-        }
-        with open(f"{path}/metadata.json", 'w') as f:
-            json.dump(metadata, f, indent=2)
-```
-
----
-
-# Dependency Resolution Best Practices
-
-**Problem**: Dependency hell.
-
-**pip-tools** for locked dependencies:
-```bash
-# requirements.in (high-level)
-numpy
-pandas
-scikit-learn
-
-# Generate locked requirements.txt
-pip-compile requirements.in
-
-# Result: requirements.txt with all transitive deps pinned
-numpy==1.24.3
-pandas==2.0.2
-  # via -r requirements.in
-scikit-learn==1.2.2
-  # via -r requirements.in
-scipy==1.10.1
-  # via scikit-learn
-```
-
-**Poetry** (modern alternative):
-```toml
-[tool.poetry.dependencies]
-python = "^3.10"
-numpy = "^1.24"
-pandas = "^2.0"
-
-# Poetry auto-resolves compatible versions
-# Creates poetry.lock for exact reproducibility
-```
-
----
-
-# Container Best Practices
-
-**Multi-stage builds** (smaller images):
-```dockerfile
-# Build stage
-FROM python:3.10 AS builder
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --user -r requirements.txt
-
-# Runtime stage
-FROM python:3.10-slim
-WORKDIR /app
-COPY --from=builder /root/.local /root/.local
-COPY . .
-ENV PATH=/root/.local/bin:$PATH
-CMD ["python", "app.py"]
-```
-
-**Benefits**: Final image ~200MB vs ~1GB.
-
-**Security**:
-```dockerfile
-# Don't run as root
-RUN useradd -m myuser
-USER myuser
-
-# Pin base image version
-FROM python:3.10.12-slim
-
-# Scan for vulnerabilities
-# docker scan myimage:latest
-```
-
----
-
-# Testing for Reproducibility
-
-**Automated reproducibility tests**:
-```python
-def test_reproducibility():
-    """Test that model training is deterministic."""
-    set_seed(42)
-    model1 = train_model(data, epochs=5)
-    loss1 = model1.evaluate(test_data)
-
-    set_seed(42)
-    model2 = train_model(data, epochs=5)
-    loss2 = model2.evaluate(test_data)
-
-    # Should be EXACTLY equal
-    assert loss1 == loss2, f"Non-deterministic: {loss1} != {loss2}"
-
-    # Check model weights are identical
-    for p1, p2 in zip(model1.parameters(), model2.parameters()):
-        assert torch.allclose(p1, p2), "Weights differ!"
-```
-
-**Run in CI/CD** to catch non-determinism early.
-
----
-
-# Continuous Reproducibility Monitoring
-
-**Track reproducibility metrics over time**:
-```python
-def log_reproducibility_metadata():
-    """Log all factors affecting reproducibility."""
-    metadata = {
-        'git_commit': get_git_hash(),
-        'git_branch': get_git_branch(),
-        'data_hash': compute_data_hash(),
-        'python_version': sys.version,
-        'torch_version': torch.__version__,
-        'cuda_version': torch.version.cuda,
-        'cudnn_version': torch.backends.cudnn.version(),
-        'hostname': socket.gethostname(),
-        'timestamp': datetime.now().isoformat(),
-        'random_seed': 42,
-        'config': load_config()
-    }
-
-    # Log to MLflow/W&B
-    mlflow.log_params(metadata)
-
-    return metadata
-```
-
-**Alert on drift**: Notify if results differ from baseline.
-
----
-
-# Reproducibility Checklist
-
-**Before running experiments**:
-- [ ] Set all random seeds
-- [ ] Pin all package versions
-- [ ] Document Python version
-- [ ] Version control code (Git)
-- [ ] Version control data (DVC)
-- [ ] Document hardware (GPU model, CUDA version)
-
-**During training**:
-- [ ] Log hyperparameters
-- [ ] Save checkpoints with metadata
-- [ ] Track metrics
-- [ ] Log system info
-
-**After training**:
-- [ ] Test reproducibility (re-run with same seed)
-- [ ] Document results
-- [ ] Archive model + metadata
-- [ ] Create reproducibility report
-
----
-
-# Resources
-
-**Tools:**
-- Docker: https://docs.docker.com/
-- Poetry: https://python-poetry.org/
-- DVC: https://dvc.org/
-- MLflow: https://mlflow.org/
-- Weights & Biases: https://wandb.ai/
-
-**Guides:**
-- Reproducible ML: https://www.nature.com/articles/s41592-021-01256-7
-- Docker for Data Science: https://towardsdatascience.com/docker-for-data-science
-- DVC Tutorial: https://dvc.org/doc/start
+# When to Use Docker
+
+**Use Docker when:**
+- Sharing with others on different OS
+- Deploying to cloud/servers
+- Complex dependencies (CUDA, system libraries)
+- Team projects
+
+**Skip Docker when:**
+- Personal projects on one machine
+- Quick prototyping
+- Simple pure-Python code
+
+**Start with venv + requirements.txt. Add Docker when needed.**
 
 ---
 
 <!-- _class: lead -->
-<!-- _paginate: false -->
+
+# Part 4: Project Structure
+
+*Organize for reproducibility*
+
+---
+
+# A Reproducible Project Structure
+
+```
+netflix-predictor/
+├── data/
+│   ├── raw/              # Original, never modified
+│   └── processed/        # Cleaned data
+├── models/               # Saved models
+├── notebooks/            # Jupyter notebooks
+├── src/                  # Source code
+│   ├── data.py          # Data loading
+│   ├── train.py         # Training script
+│   └── predict.py       # Prediction script
+├── requirements.txt      # Dependencies
+├── README.md             # Documentation
+├── .gitignore           # What to ignore in Git
+└── config.yaml          # Configuration
+```
+
+---
+
+# The README: Your Project's Front Door
+
+Every project needs a good README:
+
+```markdown
+# Netflix Movie Predictor
+
+Predicts movie success based on features.
+
+## Setup
+
+1. Create virtual environment:
+   python -m venv venv
+   source venv/bin/activate
+
+2. Install dependencies:
+   pip install -r requirements.txt
+
+3. Download data:
+   python src/download_data.py
+
+## Usage
+
+Train model:
+python src/train.py
+
+Make predictions:
+python src/predict.py --input movie.csv
+```
+
+---
+
+# Configuration Files
+
+**Don't hardcode values in your code!**
+
+```python
+# Bad
+learning_rate = 0.01
+batch_size = 32
+model_path = "/home/nipun/models/netflix.pkl"
+```
+
+**Use a config file:**
+
+```yaml
+# config.yaml
+training:
+  learning_rate: 0.01
+  batch_size: 32
+  epochs: 100
+
+paths:
+  model: models/netflix.pkl
+  data: data/processed/
+```
+
+---
+
+# Loading Config Files
+
+```python
+import yaml
+
+def load_config(path="config.yaml"):
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+config = load_config()
+print(config["training"]["learning_rate"])  # 0.01
+```
+
+**Benefits:**
+- Change settings without modifying code
+- Track configuration in Git
+- Different configs for dev/prod
+
+---
+
+# .gitignore: What NOT to Track
+
+```gitignore
+# Data files (too large for Git)
+data/raw/
+*.csv
+
+# Models (too large)
+models/*.pkl
+*.pth
+
+# Environment
+venv/
+__pycache__/
+
+# Secrets
+.env
+secrets.yaml
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+```
+
+---
+
+<!-- _class: lead -->
+
+# Part 5: Putting It Together
+
+*Reproducibility checklist*
+
+---
+
+# Reproducibility Checklist
+
+Before sharing your project:
+
+- [ ] **Virtual environment** - venv or conda
+- [ ] **requirements.txt** - with pinned versions
+- [ ] **Random seeds** - set at script start
+- [ ] **README** - setup and usage instructions
+- [ ] **Config file** - no hardcoded values
+- [ ] **.gitignore** - exclude data/models
+- [ ] **Test it** - clone fresh and run
+- [ ] **Docker** (optional) - for complex setups
+
+---
+
+# Quick Setup Script
+
+Create `setup.sh`:
+
+```bash
+#!/bin/bash
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Download data (if needed)
+python src/download_data.py
+
+echo "Setup complete! Run: source venv/bin/activate"
+```
+
+Now anyone can run: `bash setup.sh`
+
+---
+
+# Netflix Project: Reproducibility
+
+Let's apply this to our project:
+
+```
+netflix-predictor/
+├── data/
+│   └── movies.csv
+├── src/
+│   ├── train.py
+│   └── predict.py
+├── models/
+│   └── .gitkeep
+├── requirements.txt
+├── config.yaml
+├── README.md
+├── .gitignore
+└── setup.sh
+```
+
+**Now anyone can reproduce our movie predictor!**
+
+---
+
+# Key Takeaways
+
+1. **Virtual environments** isolate project dependencies
+   - Use venv or conda
+   - Pin versions in requirements.txt
+
+2. **Random seeds** ensure reproducible results
+   - Set at script start
+   - Use random_state parameter
+
+3. **Docker** packages everything (when needed)
+   - OS + Python + libraries + code
+
+4. **Project structure** matters
+   - README, config, .gitignore
+   - Separate code, data, models
+
+---
+
+# Common Mistakes
+
+- Not pinning versions in requirements.txt
+- Forgetting random_state in train_test_split
+- Committing data/models to Git (use .gitignore!)
+- Hardcoding file paths ("/home/nipun/...")
+- No README (how do I run this?)
+- Testing only on your machine
+
+**The test:** Can a friend run your code from scratch?
+
+---
+
+# Lab Preview
+
+**This week's hands-on:**
+
+1. Create a virtual environment for your Netflix project
+2. Generate requirements.txt with pinned versions
+3. Add random seeds to your training script
+4. Create a proper README
+5. Write a Dockerfile (optional bonus)
+6. Have a friend test your setup!
+
+---
+
+<!-- _class: lead -->
 
 # Questions?
 
-Next: Testing & CI/CD for AI
-Lab: Dockerize ML project, setup experiment tracking
+**Today's key concepts:**
+- Virtual environments (venv, conda)
+- requirements.txt
+- Random seeds
+- Docker basics
+- Project structure
 
+**Remember:** Reproducibility is a gift to your future self!
