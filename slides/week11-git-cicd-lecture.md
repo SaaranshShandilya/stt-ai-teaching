@@ -55,17 +55,18 @@ paginate: true
 
 <div class="insight">
 
-**CI/CD exists because humans are unreliable.** We forget to run tests. We skip code review when we're in a hurry. We say "I'll fix it later" and never do. CI/CD is a robot that never forgets, never gets tired, and never skips steps. It's not about distrust - it's about building a system that catches our inevitable mistakes.
+**CI/CD exists because humans are unreliable.** We forget tests. We skip review. We say "I'll fix it later."
 
 </div>
 
+CI/CD is a robot that never forgets, never gets tired, never skips steps.
+
 ```
 Without CI/CD:          With CI/CD:
-Human: "I ran the       Robot: "Tests failed on line 42.
-tests, trust me!"       Here's the error. Fix it."
-       ↓                        ↓
-Production breaks       Production stays safe
-at 3am on Friday        (Robot doesn't care about Friday)
+Human: "I ran the       Robot: "Tests failed on line 42."
+tests, trust me!"              ↓
+       ↓                Production stays safe
+Production breaks
 ```
 
 ---
@@ -141,21 +142,22 @@ git push origin feature/add-validation
 
 <div class="insight">
 
-**A branch is like creating a parallel universe.** You can experiment wildly, make mistakes, even break everything - and main stays safe. When your experiment succeeds, you merge the universes. When it fails, you just delete that universe. No harm done to the main timeline.
+**A branch is like creating a parallel universe.** Experiment wildly - main stays safe.
 
 </div>
 
 ```
-main (the safe universe)
+main (safe universe)
   │
-  ├──→ feature/risky-experiment  (parallel universe)
+  ├──→ feature/risky-experiment
   │         │
-  │         ├── Try crazy things
-  │         ├── Break stuff
+  │         ├── Try crazy things, break stuff
   │         └── Success! → Merge back to main
   │                              ↓
   └─────────────────────────────(main improved!)
 ```
+
+When it fails? Just delete that universe. No harm done.
 
 ---
 

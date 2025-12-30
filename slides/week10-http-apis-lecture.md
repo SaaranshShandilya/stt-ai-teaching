@@ -52,9 +52,20 @@ Think of it like a restaurant:
 
 <div class="insight">
 
-**An API is a universal translator.** It doesn't matter if your model is in Python, if your client is a mobile app written in Swift, or if your dashboard uses JavaScript. Everyone speaks HTTP. Everyone understands JSON. Your ML model becomes accessible to the entire world.
+**An API is a universal translator.** Everyone speaks HTTP. Everyone understands JSON.
 
 </div>
+
+- Your model is in Python
+- Client could be a mobile app (Swift)
+- Dashboard uses JavaScript
+- Another service uses Go
+
+**Your ML model becomes accessible to the entire world.**
+
+---
+
+# The Universal Language
 
 ```
 Python Model  ←→  API  ←→  Mobile App (Swift)
@@ -241,9 +252,18 @@ class MovieInput(BaseModel):
 
 <div class="insight">
 
-**Pydantic is like a bouncer at a club with a strict dress code.** No ID? Go away. Wrong type? Go away. Budget is negative? Go away. This validation happens BEFORE your code runs, so you never have to write `if budget < 0: return error`. Pydantic does it automatically. Your model only sees clean, validated data.
+**Pydantic is like a bouncer at a club.** No ID? Go away. Wrong type? Go away.
 
 </div>
+
+Validation happens BEFORE your code runs:
+- No need to write `if budget < 0: return error`
+- Pydantic does it automatically
+- Your model only sees clean, validated data
+
+---
+
+# Pydantic in Action
 
 ```
 Raw Request JSON                    Pydantic                  Your Code
@@ -423,19 +443,19 @@ def predict(movie: MovieInput):
 
 <div class="insight">
 
-**Status codes are how APIs communicate without words.** Just like you can tell if someone is happy or angry from their expression, status codes tell you instantly if a request worked or failed - before you even read the response body. Learn the families: 2xx = success, 4xx = your fault, 5xx = server's fault.
+**Status codes tell you instantly if a request worked or failed.**
 
 </div>
 
+Learn the families:
+- **2xx** = Success
+- **4xx** = Your fault (bad request)
+- **5xx** = Server's fault
+
 ```
-Client: "Give me prediction for budget=-50"
-Server: 422 💢 (Validation Error - your fault!)
-
-Client: "Give me prediction for budget=100"
-Server: 500 😰 (Server Error - our fault, sorry!)
-
-Client: "Give me prediction for budget=100"
-Server: 200 😊 (Success!)
+Client: "budget=-50" → Server: 422 (your fault!)
+Client: "budget=100" → Server: 500 (our fault!)
+Client: "budget=100" → Server: 200 (success!)
 ```
 
 ---
@@ -465,19 +485,28 @@ def health_check():
 
 <div class="insight">
 
-**A health check is your API's pulse.** In production, automated systems constantly ping your `/health` endpoint - like a doctor checking your heartbeat. No response? The system knows something is wrong and can restart your service or redirect traffic. Without this, your API could be dead and nobody would know until users complain.
+**A health check is your API's pulse.** No response = something is wrong.
 
 </div>
 
+In production:
+- Load balancers ping `/health` every 30 seconds
+- No response? Restart service or redirect traffic
+- Without this, your API could be dead and nobody knows
+
+---
+
+# Health Check Flow
+
 ```
-Load Balancer pings /health every 30 seconds:
+Load Balancer pings /health:
     ┌────────────┐     /health?     ┌────────────┐
     │   Load     │ ───────────────→ │   API 1    │ ✓ 200 OK
     │  Balancer  │                  └────────────┘
     │            │     /health?     ┌────────────┐
     │            │ ───────────────→ │   API 2    │ ✗ No response!
     └────────────┘                  └────────────┘
-         │                              (removed from rotation)
+         │                              (removed)
          └──→ Only sends traffic to API 1
 ```
 

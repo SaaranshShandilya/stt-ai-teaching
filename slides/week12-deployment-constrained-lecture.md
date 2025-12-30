@@ -69,21 +69,19 @@ paginate: true
 
 <div class="insight">
 
-**Physics limits cloud AI.** Light travels 300km per millisecond. A round trip to a server and back takes time no algorithm can reduce. For a self-driving car needing to react in 10ms, a 100ms network round-trip is fatal. Edge AI isn't just convenient - for some applications, it's the only option.
+**Physics limits cloud AI.** Light travels 300km per millisecond. No algorithm can reduce this.
 
 </div>
 
 ```
-Cloud AI:    You → Network (50ms) → Server → Network (50ms) → Response
-             Total: 100+ ms minimum
+Cloud AI:  You → Network (50ms) → Server → Network (50ms) → Response
+           Total: 100+ ms
 
-Edge AI:     You → Local Device → Response
-             Total: 10 ms
-
-Self-driving car at 60mph:
-  100ms = 2.7 meters traveled (too late to brake!)
-  10ms  = 0.27 meters (can still react)
+Edge AI:   You → Local Device → Response
+           Total: 10 ms
 ```
+
+Self-driving car at 60mph: 100ms = 2.7 meters (too late!), 10ms = 0.27 meters (can react)
 
 ---
 
@@ -120,9 +118,11 @@ Int8:     8 bits per weight  → 4x compression!
 
 <div class="insight">
 
-**Do you really need 9 decimal places?** A weight of 0.234567891 vs 0.23 - does it matter? For most neural networks, the answer is "barely." The model learned approximate patterns, not exact numbers. Quantization exploits this: we trade precision we don't need for speed and size we do need.
+**Do you really need 9 decimal places?** 0.234567891 vs 0.23 - barely matters for neural networks.
 
 </div>
+
+Quantization exploits this: trade precision you don't need for speed and size you do need.
 
 | Precision | Example Value | Use Case |
 |-----------|--------------|----------|
@@ -277,19 +277,18 @@ Student (Small):  10 MB, 93% accuracy
 
 <div class="insight">
 
-**Hard labels throw away information.** A label saying "cat" tells you nothing about how cat-like vs dog-like an image is. But a teacher saying "90% cat, 8% dog, 2% fox" reveals structure - cats and dogs are similar, cats and airplanes aren't. The student learns these relationships, not just the final answer.
+**Hard labels throw away information.** "cat" tells you nothing about cat-like vs dog-like.
 
 </div>
 
 ```
-                          Hard Label      Soft Label (Teacher)
-Image of fluffy cat:      "cat"           cat:0.90, dog:0.08, fox:0.02
-                           ↑                      ↑
-                     No nuance!          "This looks a bit dog-like too"
-
-Student learns: Cats and dogs have similar features (fur, ears, etc.)
-                Cats and airplanes are nothing alike
+                      Hard Label    Soft Label (Teacher)
+Image of fluffy cat:     "cat"      cat:0.90, dog:0.08, fox:0.02
+                          ↑                   ↑
+                    No nuance!      "Looks a bit dog-like too"
 ```
+
+Student learns relationships: cats and dogs are similar, cats and airplanes aren't.
 
 ---
 
