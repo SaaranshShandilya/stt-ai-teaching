@@ -5,21 +5,21 @@ subtitle: "Lecture Slides & Lab Exercises"
 
 ::: {.callout-note}
 ## Course Information
+
 **Instructor:** Prof. Nipun Batra, IIT Gandhinagar
+
 **Semester:** January 2026
+
 **Format:** 1.5-hour lecture + 3-hour hands-on lab each week
+
 **Course Website:** [nipunbatra.github.io/stt-ai-26](https://nipunbatra.github.io/stt-ai-26/)
+
 **Repository:** [github.com/nipunbatra/stt-ai-teaching](https://github.com/nipunbatra/stt-ai-teaching)
 :::
 
 ## About This Course
 
 This 15-week course covers the **complete software engineering stack for modern AI development**. While most ML courses focus on algorithms, this course focuses on the engineering practices that make ML systems work in the real world.
-
-::: {.callout-tip}
-## Running Theme: Netflix Movie Prediction
-Throughout the course, you'll build a complete ML system to predict movie success—from collecting data via APIs to deploying and monitoring your model in production.
-:::
 
 ### Learning Outcomes
 
