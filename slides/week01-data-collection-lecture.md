@@ -277,14 +277,20 @@ requests.get("https://nipun-api-testing.hf.space/items")
 
 # Why Do APIs Exist?
 
-![width:700px](../figures/api_bank_teller_analogy.png)
+![width:850px](../figures/api_bank_teller_analogy.png)
+
+**APIs are like a bank teller window.** You can't walk into the vault, but you can request transactions through a controlled interface.
+
+---
+
+# APIs Provide Protection
 
 | Without APIs | With APIs |
 |--------------|-----------|
 | Anyone reads ALL data | Only expose what you want |
 | Anyone can modify/delete | Validate every request |
 | No tracking | Log and monitor usage |
-| Server overwhelmed | Protect against abuse |
+| Server overwhelmed | Rate limiting protects resources |
 
 ---
 
