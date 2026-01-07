@@ -478,45 +478,25 @@ Request 2: "Now show me Avatar." → "Who are you?"
 
 ---
 
-# HTTP Request Structure
+# See HTTP in Action: Chrome DevTools
 
-Every HTTP request has three parts:
+**Press F12 → Network tab → Refresh page**
+
+Visit [iitgn.ac.in](https://iitgn.ac.in) and see what your browser sends:
 
 ```http
-┌───────────────────────────────────────────────────────────────┐
-│ 1. REQUEST LINE                                               │
-│    GET /movies?t=Inception HTTP/1.1                           │
-├───────────────────────────────────────────────────────────────┤
-│ 2. HEADERS                                                    │
-│    Host: api.omdbapi.com                                      │
-│    User-Agent: Python/3.9                                     │
-│    Accept: application/json                                   │
-│    Authorization: Bearer abc123                               │
-├───────────────────────────────────────────────────────────────┤
-│ 3. BODY (optional, for POST/PUT)                              │
-│    {"title": "New Movie", "year": 2024}                       │
-└───────────────────────────────────────────────────────────────┘
+GET / HTTP/1.1
+Host: iitgn.ac.in
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)...
+Accept: text/html,application/xhtml+xml,application/xml...
 ```
 
----
-
-# HTTP Response Structure
-
-Every HTTP response has three parts:
-
+**Response from server:**
 ```http
-┌───────────────────────────────────────────────────────────────┐
-│ 1. STATUS LINE                                                │
-│    HTTP/1.1 200 OK                                            │
-├───────────────────────────────────────────────────────────────┤
-│ 2. HEADERS                                                    │
-│    Content-Type: application/json                             │
-│    Content-Length: 1234                                       │
-│    X-RateLimit-Remaining: 99                                  │
-├───────────────────────────────────────────────────────────────┤
-│ 3. BODY (the actual data)                                     │
-│    {"Title": "Inception", "Year": "2010", ...}                │
-└───────────────────────────────────────────────────────────────┘
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Server: Apache
+Content-Length: 13742
 ```
 
 ---
@@ -526,143 +506,46 @@ Every HTTP response has three parts:
 ```
 https://api.omdbapi.com:443/v1/movies?t=Inception&y=2010
 └─┬──┘ └──────┬───────┘└┬─┘└───┬───┘└─────────┬────────┘
-  │           │         │      │              │
 Protocol    Host      Port   Path          Query
 ```
 
-| Component | Description | Example |
-|-----------|-------------|---------|
-| Protocol | `http://` or `https://` | `https://` |
-| Host | Domain or IP | `api.omdbapi.com` |
-| Port | Usually implicit | 443 (HTTPS) |
-| Path | Resource location | `/v1/movies` |
-| Query | `key=value` pairs | `?t=Inception` |
+| Component | Example |
+|-----------|---------|
+| Protocol | `https://` (secure) |
+| Host | `api.omdbapi.com` |
+| Path | `/v1/movies` |
+| Query | `?t=Inception&y=2010` |
 
 ---
 
-# Common HTTP Headers
+# Key HTTP Headers
 
-**Request Headers** (what client sends):
-
-| Header | Purpose | Example |
-|--------|---------|---------|
-| `Host` | Target server | `api.omdbapi.com` |
-| `User-Agent` | Client identification | `Mozilla/5.0` |
-| `Accept` | Preferred response format | `application/json` |
-| `Authorization` | Authentication | `Bearer token123` |
-| `Content-Type` | Body format (POST) | `application/json` |
+| Header | What it does |
+|--------|--------------|
+| `Host` | Which server to contact |
+| `User-Agent` | Identifies your browser/script |
+| `Accept` | What format you want back |
+| `Content-Type` | Format of data you're sending |
+| `Authorization` | Your API key or token |
 
 ---
 
-# Common HTTP Headers (Response)
+# HTTP Methods: GET vs POST
 
-**Response Headers** (what server sends):
+| | **GET** | **POST** |
+|---|---------|----------|
+| **Purpose** | Retrieve data | Submit data |
+| **Parameters** | In URL (`?key=value`) | In body |
+| **Example** | Search, fetch details | Login, upload, create |
+| **Data collection** | 90% of the time | 10% of the time |
 
-| Header | Purpose | Example |
-|--------|---------|---------|
-| `Content-Type` | Body format | `application/json` |
-| `Content-Length` | Size in bytes | `1234` |
-| `Cache-Control` | Caching rules | `max-age=3600` |
-| `X-RateLimit-Remaining` | API quota left | `99` |
-| `Set-Cookie` | Session cookie | `session=abc123` |
+```bash
+# GET - parameters in URL
+curl "https://api.example.com/search?q=inception"
 
----
-
-<!-- _class: lead -->
-
-# Part 5: HTTP Methods - GET and POST
-
-*The two most important verbs*
-
----
-
-# HTTP Methods Overview
-
-| Method | Purpose | Has Body? | Safe? | Idempotent? |
-|--------|---------|-----------|-------|-------------|
-| **GET** | Retrieve data | No | Yes | Yes |
-| **POST** | Create/submit data | Yes | No | No |
-| PUT | Replace resource | Yes | No | Yes |
-| PATCH | Partial update | Yes | No | No |
-| DELETE | Remove resource | No | No | Yes |
-
-**For data collection**: 90% GET, 10% POST
-
----
-
-# What Do "Safe" and "Idempotent" Mean?
-
-<div class="insight">
-
-**Safe** = "Looking doesn't change anything" (like window shopping)
-**Idempotent** = "Doing it twice has the same effect as once"
-
-</div>
-
-| Action | Safe? | Idempotent? |
-|--------|-------|-------------|
-| Reading a book | Yes | Yes |
-| Ordering pizza | No | No |
-| Setting thermostat to 72° | No | Yes |
-
-**Why this matters:**
-- GET can be cached and retried safely
-- POST should not be auto-retried (double-charge risk!)
-
----
-
-# GET Request: Retrieving Data
-
-**Purpose**: Fetch data without modifying anything.
-
-```http
-GET /movies?t=Inception&y=2010 HTTP/1.1
-Host: api.omdbapi.com
-Accept: application/json
+# POST - data in body
+curl -X POST https://api.example.com/login -d '{"user":"alice"}'
 ```
-
-**Characteristics**:
-- Parameters in URL (query string)
-- No request body
-- **Safe**: Doesn't change server state
-- **Idempotent**: Same request = same result
-- **Cacheable**: Responses can be cached
-
----
-
-# POST Request: Sending Data
-
-**Purpose**: Submit data to create or process something.
-
-```http
-POST /api/feedback HTTP/1.1
-Host: example.com
-Content-Type: application/json
-
-{"movie_id": 123, "rating": 5, "review": "Great!"}
-```
-
-**Characteristics**:
-- Data in request body (not URL)
-- **Not safe**: Modifies server state
-- **Not idempotent**: Multiple POSTs create multiple resources
-- **Not cacheable**
-
----
-
-# GET vs POST: When to Use Which
-
-| Scenario | Method | Why |
-|----------|--------|-----|
-| Fetching movie details | GET | Retrieving data |
-| Searching for movies | GET | Query in URL |
-| Submitting a review | POST | Creating new data |
-| Uploading an image | POST | Sending binary data |
-| User login | POST | Sensitive data in body |
-| Listing all movies | GET | No modification |
-
-**Data Collection = Mostly GET**
-**Data Submission = POST**
 
 ---
 
