@@ -478,26 +478,52 @@ Request 2: "Now show me Avatar." → "Who are you?"
 
 ---
 
-# See HTTP in Action: Chrome DevTools
+# Chrome DevTools: Your HTTP Inspector
 
-**Press F12 → Network tab → Refresh page**
+**Open DevTools:** `F12` or `Cmd+Option+I` (Mac) / `Ctrl+Shift+I` (Windows)
 
-Visit [iitgn.ac.in](https://iitgn.ac.in) and see what your browser sends:
+**DevTools lets you see:**
+- Every HTTP request your browser makes
+- Request/response headers and body
+- **Copy requests as curl commands!**
 
+**Navigate to the "Network" tab** → This is where the magic happens
+
+---
+
+# Try It: Visit [iitgn.ac.in](https://iitgn.ac.in)
+
+**What your browser sends:**
 ```http
 GET / HTTP/1.1
 Host: iitgn.ac.in
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)...
-Accept: text/html,application/xhtml+xml,application/xml...
 ```
 
-**Response from server:**
+**What server responds:**
 ```http
 HTTP/1.1 200 OK
-Content-Type: text/html; charset=UTF-8
 Server: Apache
-Content-Length: 13742
+Content-Type: text/html; charset=UTF-8
 ```
+
+---
+
+# Try It: Visit [Teaching API](https://nipun-api-testing.hf.space/items)
+
+**Filter by "Fetch/XHR" to see API calls:**
+```http
+GET /items HTTP/1.1
+Host: nipun-api-testing.hf.space
+Accept: */*
+```
+
+**Response (JSON):**
+```json
+{"items": [{"id": 1, "name": "Apple", "price": 1.5}, ...], "count": 3}
+```
+
+**Right-click → "Copy as cURL"** to replay in terminal!
 
 ---
 
@@ -826,173 +852,7 @@ print(binary_data.hex())  # 0a09496e63657074696f6e10da0f...
 
 <!-- _class: lead -->
 
-# Part 7: Chrome DevTools
-
-*Your window into HTTP traffic*
-
----
-
-# Why Chrome DevTools?
-
-**DevTools lets you see:**
-- Every HTTP request your browser makes
-- Request headers, body, timing
-- Response headers, body, status codes
-- Copy requests as curl commands!
-
-**This is how you learn what APIs a website uses.**
-
----
-
-# Opening DevTools
-
-**Three ways to open:**
-
-1. **Keyboard**: `F12` or `Ctrl+Shift+I` (Windows/Linux) / `Cmd+Option+I` (Mac)
-
-2. **Right-click**: Right-click on page → "Inspect"
-
-3. **Menu**: Chrome menu → More Tools → Developer Tools
-
-**Navigate to the "Network" tab**
-
----
-
-# The Network Tab
-
-```
-┌───────────────────────────────────────────────────────────────────┐
-│  Network                                                          │
-├───────────────────────────────────────────────────────────────────┤
-│  [*] Preserve log   [ ] Disable cache   [Filter]                  │
-├───────────────────────────────────────────────────────────────────┤
-│  Name          Status   Type      Size     Time                   │
-├───────────────────────────────────────────────────────────────────┤
-│  api/movies    200      fetch     1.2 KB   45 ms                  │
-│  styles.css    200      css       5.4 KB   23 ms                  │
-│  logo.png      200      image     15 KB    67 ms                  │
-│  analytics.js  200      script    8.1 KB   89 ms                  │
-└───────────────────────────────────────────────────────────────────┘
-```
-
-Every row = one HTTP request/response
-
----
-
-# Filtering Requests
-
-**Filter by type:**
-
-| Filter | Shows |
-|--------|-------|
-| **All** | Everything |
-| **Fetch/XHR** | API calls (AJAX) ← Most useful! |
-| **Doc** | HTML documents |
-| **CSS** | Stylesheets |
-| **JS** | JavaScript files |
-| **Img** | Images |
-
-**Click "Fetch/XHR" to see only API calls**
-
----
-
-# Inspecting a Request
-
-**Click on any request to see details:**
-
-```
-┌───────────────────────────────────────────────────────────────────┐
-│  Headers   Preview   Response   Timing   Cookies                  │
-├───────────────────────────────────────────────────────────────────┤
-│  General:                                                         │
-│    Request URL: https://www.omdbapi.com/?i=tt3896198&apikey=[KEY] │
-│    Request Method: GET                                            │
-│    Status Code: 200 OK                                            │
-├───────────────────────────────────────────────────────────────────┤
-│  Response Headers:                                                │
-│    content-type: application/json                                 │
-│    x-ratelimit-remaining: 99                                      │
-├───────────────────────────────────────────────────────────────────┤
-│  Request Headers:                                                 │
-│    authorization: Bearer eyJhbGc...                               │
-│    user-agent: Mozilla/5.0...                                     │
-└───────────────────────────────────────────────────────────────────┘
-```
-
----
-
-# The Preview & Response Tabs
-
-**Preview Tab**: Formatted JSON viewer
-
-```json
-{
-  "title": "Inception",
-  "year": 2010,
-  "rating": 8.8
-}
-```
-
-**Response Tab**: Raw response body
-
-```
-{"title":"Inception","year":2010,"rating":8.8}
-```
-
----
-
-# Copy as curl
-
-**The most powerful feature!**
-
-1. Right-click on any request
-2. Select "Copy" → "Copy as cURL"
-3. Paste into terminal
-
-```bash
-curl "https://www.omdbapi.com/?t=Inception&apikey=[API_KEY]" \
-  -H "accept: application/json" \
-  --compressed
-```
-
-**Now you can replay the exact request from your terminal!**
-
----
-
-# Demo: Finding Hidden APIs
-
-**Many websites use hidden APIs. Here's how to find them:**
-
-1. Open DevTools → Network tab
-2. Filter by "Fetch/XHR"
-3. Interact with the website (search, click, load more)
-4. Watch for API calls appearing in the list
-5. Click on interesting requests to inspect them
-6. Copy as curl to test in terminal
-
-**Example**: Search on IMDb and watch for API calls...
-
----
-
-# DevTools Pro Tips
-
-**Preserve log**: Keep requests when navigating between pages
-
-**Disable cache**: See fresh requests every time
-
-**Search**: `Ctrl+F` to search in all requests
-
-**Filter by URL**: Type in filter box to match URLs
-
-**Clear**: Click the clear icon to clear all requests
-
-**Throttling**: Simulate slow networks (3G, offline)
-
----
-
-<!-- _class: lead -->
-
-# Part 8: Making Requests with curl
+# Part 7: Making Requests with curl
 
 *The command-line HTTP client*
 
