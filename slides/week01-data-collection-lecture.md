@@ -277,11 +277,7 @@ requests.get("https://nipun-api-testing.hf.space/items")
 
 # Why Do APIs Exist?
 
-<div class="insight">
-
-**APIs are like a bank teller window.** You can't walk into the vault, but you can request transactions through a controlled interface.
-
-</div>
+![width:700px](../figures/api_bank_teller_analogy.png)
 
 | Without APIs | With APIs |
 |--------------|-----------|
