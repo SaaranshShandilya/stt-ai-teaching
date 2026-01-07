@@ -243,6 +243,14 @@ When APIs don't exist or don't have what you need:
 
 ---
 
+# Our Sample Database
+
+![width:900px](../figures/sqlite_movies_db.png)
+
+**Try it yourself:** `sqlite3 data/movies.db "SELECT * FROM movies"`
+
+---
+
 # API: The Formal Definition
 
 **API (Application Programming Interface)**
@@ -251,10 +259,12 @@ A defined set of rules and protocols for building and interacting with software 
 
 ```python
 # Without API (direct database access - dangerous!)
-SELECT * FROM movies WHERE title = 'Inception';
+cursor.execute("SELECT * FROM movies WHERE title = 'Inception'")
+# Returns: (1, 'Inception', 2010, 'Sci-Fi', 'Christopher Nolan', 8.8, 160.0, 836.0)
 
 # With API (safe, controlled access)
-GET /movies?title=Inception
+requests.get("https://nipun-api-testing.hf.space/items")
+# Returns: {"items": [...], "count": 3}
 ```
 
 **APIs provide**:
@@ -741,19 +751,17 @@ Same movie data can be represented in different formats:
 
 # Format 1: JSON
 
-**The most common API format today.**
+**The most common API format today.** Try it live:
+
+```bash
+curl https://nipun-api-testing.hf.space/format/json
+```
 
 ```json
 {
-  "title": "Inception",
-  "year": 2010,
-  "genres": ["Sci-Fi", "Action", "Thriller"],
-  "director": {
-    "name": "Christopher Nolan",
-    "nationality": "British"
-  },
-  "rating": 8.8,
-  "in_production": false
+  "format": "JSON",
+  "content_type": "application/json",
+  "data": {"name": "Alice", "age": 30, "city": "Mumbai"}
 }
 ```
 
@@ -816,22 +824,24 @@ if data["budget"]:        # This is False!
 
 # Format 2: XML
 
-**The enterprise standard (still used in SOAP APIs).**
+**The enterprise standard (still used in SOAP APIs).** Try it live:
+
+```bash
+curl https://nipun-api-testing.hf.space/format/xml
+```
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<movie>
-  <title>Inception</title>
-  <year>2010</year>
-  <genres>
-    <genre>Sci-Fi</genre>
-    <genre>Action</genre>
-  </genres>
-  <director nationality="British">
-    Christopher Nolan
-  </director>
-  <rating>8.8</rating>
-</movie>
+<response>
+    <format>XML</format>
+    <data>
+        <user>
+            <name>Alice</name>
+            <age>30</age>
+            <city>Mumbai</city>
+        </user>
+    </data>
+</response>
 ```
 
 **Pros**: Schema validation (XSD), attributes, widespread support
@@ -854,24 +864,21 @@ if data["budget"]:        # This is False!
 
 # Format 3: CSV
 
-**The data scientist's friend.**
+**The data scientist's friend.** Try it live:
 
-```csv
-title,year,genre,director,rating
-Inception,2010,Sci-Fi,Christopher Nolan,8.8
-Avatar,2009,Action,James Cameron,7.9
-The Matrix,1999,Sci-Fi,Wachowskis,8.7
+```bash
+curl https://nipun-api-testing.hf.space/format/csv
 ```
 
-**Pros**:
-- Opens in Excel/Google Sheets
-- Easy to load into pandas: `pd.read_csv("movies.csv")`
-- Very compact
+```csv
+id,name,price,quantity,description
+1,Apple,1.50,100,Fresh red apple
+2,Banana,0.75,150,Yellow banana
+3,Orange,2.00,80,Juicy orange
+```
 
-**Cons**:
-- Flat structure only (no nesting)
-- No data types (everything is text)
-- Escaping issues with commas in data
+**Pros**: Opens in Excel, `pd.read_csv()`, very compact
+**Cons**: Flat structure only, no data types, escaping issues
 
 ---
 
@@ -912,9 +919,12 @@ message Movie {
 }
 ```
 
-**Binary on the wire** (not human-readable):
-```
-0a 09 49 6e 63 65 70 74 69 6f 6e 10 da 0f ...
+```python
+# After compiling: protoc --python_out=. movie.proto
+from movie_pb2 import Movie
+movie = Movie(title="Inception", year=2010, genres=["Sci-Fi", "Action"], rating=8.8)
+binary_data = movie.SerializeToString()  # Only 25 bytes!
+print(binary_data.hex())  # 0a09496e63657074696f6e10da0f...
 ```
 
 **Pros**: 10x smaller, 100x faster parsing
@@ -1150,17 +1160,40 @@ curl [options] [URL]
 # curl: GET Request
 
 ```bash
-# Simple GET request
-curl "https://www.omdbapi.com/?t=Inception&apikey=[API_KEY]"
+# Try these right now! (no API key needed)
+curl https://nipun-api-testing.hf.space/hello
+# {"message": "Hello, World!"}
+
+curl https://nipun-api-testing.hf.space/items
+# {"items": [{"id": 1, "name": "Apple", ...}], "count": 3}
+
+curl "https://nipun-api-testing.hf.space/greet?name=Alice"
+# {"greeting": "Hello, Alice!"}
 ```
 
-**Output:**
+**Important**: Quote URLs with `?` or `&` (prevents shell interpretation)
+
+---
+
+# curl: Real API Example (OMDb)
+
+**For actual movie data, use OMDb API** (free tier: 1000 requests/day)
+
+```bash
+# Get movie by title (requires API key)
+curl "https://www.omdbapi.com/?t=Inception&apikey=YOUR_KEY"
+```
+
 ```json
-{"Title":"Inception","Year":"2010","Rated":"PG-13",
-"Released":"16 Jul 2010","Runtime":"148 min",...}
+{
+  "Title": "Inception", "Year": "2010", "Rated": "PG-13",
+  "Genre": "Action, Adventure, Sci-Fi",
+  "Director": "Christopher Nolan",
+  "imdbRating": "8.8", "imdbID": "tt1375666"
+}
 ```
 
-**Important**: Quote the URL! (prevents shell interpretation of `&`)
+**Get your free key:** https://www.omdbapi.com/apikey.aspx
 
 ---
 
@@ -1881,28 +1914,6 @@ for m in movies:
 
 ```
 
-<!-- ---
-
-# Handling Pagination
-
-```python
-base_url = "https://example.com/movies?page="
-all_movies = []
-
-for page in range(1, 11):  # Pages 1-10
-    response = requests.get(f"{base_url}{page}")
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    movies = soup.select('.movie-card')
-    if not movies:
-        break  # No more pages
-
-    for m in movies:
-        all_movies.append(m.select_one('.title').text)
-
-    time.sleep(1)  # Be polite!
-``` -->
-
 ---
 
 # Scraping Ethics & Best Practices
@@ -1954,24 +1965,31 @@ except Exception as e:
 
 ---
 
-# Checking robots.txt
+# Checking robots.txt - Real Examples
 
 ```bash
-curl https://www.imdb.com/robots.txt
+curl https://www.google.com/robots.txt
 ```
 
 ```
 User-agent: *
-Disallow: /search/
-Disallow: /ap/
-Allow: /title/
-Crawl-delay: 1
+Disallow: /search        # Can't scrape search results
+Allow: /search/about     # But info pages are OK
+Disallow: /?             # No query parameters
 ```
 
-**Meaning:**
-- Cannot scrape `/search/` pages
-- Can scrape `/title/` pages (movie pages)
-- Wait 1 second between requests
+```bash
+curl https://www.amazon.com/robots.txt
+```
+
+```
+User-agent: *
+Disallow: /gp/cart       # No shopping carts
+Disallow: /gp/sign-in    # No login pages
+Disallow: /gp/yourstore  # No personalized pages
+```
+
+**Always check before scraping!**
 
 ---
 
