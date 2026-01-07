@@ -1777,23 +1777,17 @@ response = requests.get(
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="92" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="92" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
 <h1 id="requests-response-object">requests: Response Object</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> requests
-response = requests.get(
-    <span class="hljs-string">&quot;https://www.omdbapi.com/&quot;</span>,
-    params={
-        <span class="hljs-string">&quot;apikey&quot;</span>: <span class="hljs-string">&quot;demo&quot;</span>,      <span class="hljs-comment"># replace with real key for reliability</span>
-        <span class="hljs-string">&quot;t&quot;</span>: <span class="hljs-string">&quot;Inception&quot;</span>
-    }
-)
-<span class="hljs-built_in">print</span>(response.status_code)        <span class="hljs-comment"># 200</span>
+response = requests.get(<span class="hljs-string">&quot;https://nipun-api-testing.hf.space/items&quot;</span>)
 
-<span class="hljs-built_in">print</span>(response.headers[<span class="hljs-string">&quot;Content-Type&quot;</span>])  
-
-
-<span class="hljs-built_in">print</span>(response.text) <span class="hljs-comment"># Body as raw text (string)              </span>
-
-<span class="hljs-comment"># Body parsed as JSON (Python dict)</span>
-<span class="hljs-built_in">print</span>(response.json())            
-<span class="hljs-built_in">print</span>(response.ok) <span class="hljs-comment"># True for 2xx status codes                 </span>
+response.status_code        <span class="hljs-comment"># 200</span>
+response.headers[<span class="hljs-string">&quot;Content-Type&quot;</span>]  <span class="hljs-comment"># &#x27;application/json&#x27;</span>
+response.text               <span class="hljs-comment"># Raw text (string)</span>
+response.json()             <span class="hljs-comment"># Parsed as Python dict</span>
+response.ok                 <span class="hljs-comment"># True for 2xx status codes</span>
+</code></pre>
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-comment"># Example output</span>
+<span class="hljs-meta">&gt;&gt;&gt; </span>response.json()
+{<span class="hljs-string">&#x27;items&#x27;</span>: [{<span class="hljs-string">&#x27;id&#x27;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&#x27;name&#x27;</span>: <span class="hljs-string">&#x27;Apple&#x27;</span>, ...}], <span class="hljs-string">&#x27;count&#x27;</span>: <span class="hljs-number">3</span>}
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="93" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="93" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
@@ -1802,153 +1796,93 @@ response = requests.get(
 
 response = requests.post(
     <span class="hljs-string">&quot;https://nipun-api-testing.hf.space/items&quot;</span>,
-    json={
-        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Laptop&quot;</span>,
-        <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">999.99</span>,
-        <span class="hljs-string">&quot;quantity&quot;</span>: <span class="hljs-number">1</span>,
-        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;A powerful laptop&quot;</span>
-    }
+    json={<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Laptop&quot;</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">999.99</span>, <span class="hljs-string">&quot;quantity&quot;</span>: <span class="hljs-number">1</span>}
 )
-
-<span class="hljs-built_in">print</span>(response.status_code)
-<span class="hljs-built_in">print</span>(response.json())
-
+<span class="hljs-built_in">print</span>(response.status_code)  <span class="hljs-comment"># 201 (Created)</span>
+<span class="hljs-built_in">print</span>(response.json())       <span class="hljs-comment"># {&#x27;id&#x27;: 4, &#x27;name&#x27;: &#x27;Laptop&#x27;, ...}</span>
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="94" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="94" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
 <h1 id="requests-post-with-form-data">requests: POST with Form Data</h1>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> requests
-
-url = <span class="hljs-string">&quot;https://nipun-api-testing.hf.space/form/contact&quot;</span>
-
-data = {
-    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Alice&quot;</span>,
-    <span class="hljs-string">&quot;email&quot;</span>: <span class="hljs-string">&quot;alice@example.com&quot;</span>,
-    <span class="hljs-string">&quot;subject&quot;</span>: <span class="hljs-string">&quot;Hello&quot;</span>,
-    <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;Nice API!&quot;</span>
-}
-
-response = requests.post(url, data=data)
-
-<span class="hljs-built_in">print</span>(response.status_code)
-<span class="hljs-built_in">print</span>(response.json())
-
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">response = requests.post(
+    <span class="hljs-string">&quot;https://nipun-api-testing.hf.space/form/contact&quot;</span>,
+    data={<span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-string">&quot;email&quot;</span>: <span class="hljs-string">&quot;alice@example.com&quot;</span>, <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;Hello!&quot;</span>}
+)
+<span class="hljs-built_in">print</span>(response.json())  <span class="hljs-comment"># {&#x27;status&#x27;: &#x27;received&#x27;, &#x27;name&#x27;: &#x27;Alice&#x27;, ...}</span>
 </code></pre>
 <p><strong>Remember:</strong></p>
 <ul>
-<li><code>json=</code> → Content-Type: application/json</li>
-<li><code>data=</code> → Content-Type: application/x-www-form-urlencoded</li>
+<li><code>json=</code> → sends JSON (Content-Type: application/json)</li>
+<li><code>data=</code> → sends form data (Content-Type: application/x-www-form-urlencoded)</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="95" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="95" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
 <h1 id="requests-error-handling">requests: Error Handling</h1>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">url = <span class="hljs-string">&quot;https://www.omdbapi.com/&quot;</span>
-params = {
-    <span class="hljs-string">&quot;apikey&quot;</span>: <span class="hljs-string">&quot;demo&quot;</span>,   <span class="hljs-comment"># replace with real key if needed</span>
-    <span class="hljs-string">&quot;t&quot;</span>: <span class="hljs-string">&quot;Inception&quot;</span>
-}
-<span class="hljs-keyword">try</span>:
-    response = requests.get(url, params=params, timeout=<span class="hljs-number">10</span>)
-    response.raise_for_status() <span class="hljs-comment"># Raise exception for 4xx / 5xx responses</span>
-
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">try</span>:
+    response = requests.get(<span class="hljs-string">&quot;https://nipun-api-testing.hf.space/items&quot;</span>, timeout=<span class="hljs-number">10</span>)
+    response.raise_for_status()  <span class="hljs-comment"># Raises exception for 4xx/5xx</span>
     data = response.json()
-    <span class="hljs-built_in">print</span>(data[<span class="hljs-string">&quot;Title&quot;</span>], data[<span class="hljs-string">&quot;Year&quot;</span>])
-
 <span class="hljs-keyword">except</span> requests.exceptions.Timeout:
     <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Request timed out&quot;</span>)
-
 <span class="hljs-keyword">except</span> requests.exceptions.HTTPError <span class="hljs-keyword">as</span> e:
     <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;HTTP error: <span class="hljs-subst">{e}</span>&quot;</span>)
-
 <span class="hljs-keyword">except</span> requests.exceptions.RequestException <span class="hljs-keyword">as</span> e:
     <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Request failed: <span class="hljs-subst">{e}</span>&quot;</span>)
-
 </code></pre>
 <p><strong>Key points:</strong></p>
 <ul>
-<li>Always set <code>timeout</code> to avoid hanging</li>
+<li>Always set <code>timeout</code> to avoid hanging forever</li>
 <li><code>raise_for_status()</code> converts bad status codes to exceptions</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="96" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="96" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
 <h1 id="requests-looping-over-multiple-items">requests: Looping Over Multiple Items</h1>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">movies = [<span class="hljs-string">&quot;Inception&quot;</span>, <span class="hljs-string">&quot;Avatar&quot;</span>, <span class="hljs-string">&quot;The Matrix&quot;</span>, <span class="hljs-string">&quot;Interstellar&quot;</span>]
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">movies = [<span class="hljs-string">&quot;Inception&quot;</span>, <span class="hljs-string">&quot;Avatar&quot;</span>, <span class="hljs-string">&quot;The Matrix&quot;</span>]
 results = []
-
-url = <span class="hljs-string">&quot;https://www.omdbapi.com/&quot;</span>
-params_base = {
-    <span class="hljs-string">&quot;apikey&quot;</span>: <span class="hljs-string">&quot;demo&quot;</span>   <span class="hljs-comment"># replace with your real key for reliability</span>
-}
 
 <span class="hljs-keyword">for</span> title <span class="hljs-keyword">in</span> movies:
     response = requests.get(
-        url,
-        params={**params_base, <span class="hljs-string">&quot;t&quot;</span>: title},
-        timeout=<span class="hljs-number">10</span>
+        <span class="hljs-string">&quot;https://www.omdbapi.com/&quot;</span>,
+        params={<span class="hljs-string">&quot;apikey&quot;</span>: <span class="hljs-string">&quot;YOUR_KEY&quot;</span>, <span class="hljs-string">&quot;t&quot;</span>: title}, timeout=<span class="hljs-number">10</span>
     )
+    <span class="hljs-keyword">if</span> response.ok <span class="hljs-keyword">and</span> response.json().get(<span class="hljs-string">&quot;Response&quot;</span>) == <span class="hljs-string">&quot;True&quot;</span>:
+        results.append(response.json())
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Got: <span class="hljs-subst">{title}</span>&quot;</span>)
+    time.sleep(<span class="hljs-number">1</span>)  <span class="hljs-comment"># Be polite - don&#x27;t hammer the server</span>
 
-    <span class="hljs-keyword">if</span> response.ok:
-        data = response.json()
-        <span class="hljs-keyword">if</span> data.get(<span class="hljs-string">&quot;Response&quot;</span>) == <span class="hljs-string">&quot;True&quot;</span>: <span class="hljs-comment"># Application-level success check</span>
-            results.append(data)
-            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Got: <span class="hljs-subst">{title}</span>&quot;</span>)
-        <span class="hljs-keyword">else</span>:
-            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Not found: <span class="hljs-subst">{title}</span> (<span class="hljs-subst">{data.get(<span class="hljs-string">&#x27;Error&#x27;</span>)}</span>)&quot;</span>)
-    <span class="hljs-keyword">else</span>:
-        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;HTTP error for <span class="hljs-subst">{title}</span>: <span class="hljs-subst">{response.status_code}</span>&quot;</span>)
 <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Collected <span class="hljs-subst">{<span class="hljs-built_in">len</span>(results)}</span> movies&quot;</span>)
-
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="97" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="97" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
 <h1 id="requests-session-for-multiple-requests">requests: Session for Multiple Requests</h1>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">import</span> requests
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">session = requests.Session()
+session.headers.update({<span class="hljs-string">&quot;Authorization&quot;</span>: <span class="hljs-string">&quot;Bearer token123&quot;</span>, <span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;MyApp/1.0&quot;</span>})
 
-<span class="hljs-comment"># Create a session (persists headers, cookies, connections)</span>
-session = requests.Session()
-
-<span class="hljs-comment"># Set default headers once</span>
-session.headers.update({
-    <span class="hljs-string">&quot;Authorization&quot;</span>: <span class="hljs-string">&quot;Bearer test-token-123&quot;</span>,
-    <span class="hljs-string">&quot;User-Agent&quot;</span>: <span class="hljs-string">&quot;MyApp/1.0&quot;</span>
-})
-
-<span class="hljs-comment"># All requests now reuse headers + connection</span>
-r1 = session.get(<span class="hljs-string">&quot;https://httpbin.org/headers&quot;</span>)
-r2 = session.get(<span class="hljs-string">&quot;https://httpbin.org/headers&quot;</span>)
-r3 = session.get(<span class="hljs-string">&quot;https://httpbin.org/headers&quot;</span>)
-
-<span class="hljs-built_in">print</span>(r1.status_code)
-<span class="hljs-built_in">print</span>(r1.json()[<span class="hljs-string">&quot;headers&quot;</span>][<span class="hljs-string">&quot;User-Agent&quot;</span>])
-<span class="hljs-built_in">print</span>(r1.json()[<span class="hljs-string">&quot;headers&quot;</span>][<span class="hljs-string">&quot;Authorization&quot;</span>])
-
+<span class="hljs-comment"># All requests reuse headers + TCP connection (faster!)</span>
+r1 = session.get(<span class="hljs-string">&quot;https://nipun-api-testing.hf.space/headers&quot;</span>)
+r2 = session.get(<span class="hljs-string">&quot;https://nipun-api-testing.hf.space/items&quot;</span>)
 </code></pre>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li>Persistent headers (set once, use everywhere)</li>
+<li>Connection pooling (faster for many requests)</li>
+<li>Cookie persistence (for auth sessions)</li>
+</ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="98" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="98" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">
 <h1 id="requests-practical-example">requests: Practical Example</h1>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch_movie_data</span>(<span class="hljs-params">titles, api_key</span>):
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">fetch_movies</span>(<span class="hljs-params">titles, api_key</span>):
     movies = []
-
     <span class="hljs-keyword">for</span> title <span class="hljs-keyword">in</span> titles:
-        response = requests.get(
-            <span class="hljs-string">&quot;https://www.omdbapi.com/&quot;</span>,
-            params={<span class="hljs-string">&quot;apikey&quot;</span>: api_key, <span class="hljs-string">&quot;t&quot;</span>: title}, timeout=<span class="hljs-number">10</span>
-        )
-        
-        <span class="hljs-keyword">if</span> response.ok: <span class="hljs-comment"># Check HTTP + API-level success</span>
-            data = response.json()
-            <span class="hljs-keyword">if</span> data.get(<span class="hljs-string">&quot;Response&quot;</span>) == <span class="hljs-string">&quot;True&quot;</span>:
-                movies.append(data)
-            <span class="hljs-keyword">else</span>:
-                <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Movie not found: <span class="hljs-subst">{title}</span>&quot;</span>)
-        <span class="hljs-keyword">else</span>:
-            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;HTTP error for <span class="hljs-subst">{title}</span>: <span class="hljs-subst">{response.status_code}</span>&quot;</span>)
+        r = requests.get(<span class="hljs-string">&quot;https://www.omdbapi.com/&quot;</span>,
+                        params={<span class="hljs-string">&quot;apikey&quot;</span>: api_key, <span class="hljs-string">&quot;t&quot;</span>: title}, timeout=<span class="hljs-number">10</span>)
+        <span class="hljs-keyword">if</span> r.ok <span class="hljs-keyword">and</span> r.json().get(<span class="hljs-string">&quot;Response&quot;</span>) == <span class="hljs-string">&quot;True&quot;</span>:
+            movies.append(r.json())
+        time.sleep(<span class="hljs-number">0.5</span>)
+    <span class="hljs-keyword">return</span> pd.DataFrame(movies)
 
-    <span class="hljs-keyword">return</span> pd.DataFrame(movies) <span class="hljs-comment"># Convert to pandas DataFrame</span>
-
-df = fetch_movie_data([<span class="hljs-string">&quot;Inception&quot;</span>, <span class="hljs-string">&quot;Avatar&quot;</span>], <span class="hljs-string">&quot;demo&quot;</span>)  <span class="hljs-comment"># demo API key</span>
-<span class="hljs-built_in">print</span>(df[[<span class="hljs-string">&quot;Title&quot;</span>, <span class="hljs-string">&quot;Year&quot;</span>, <span class="hljs-string">&quot;Genre&quot;</span>]])
-
+df = fetch_movies([<span class="hljs-string">&quot;Inception&quot;</span>, <span class="hljs-string">&quot;Avatar&quot;</span>, <span class="hljs-string">&quot;The Matrix&quot;</span>], <span class="hljs-string">&quot;YOUR_KEY&quot;</span>)
+<span class="hljs-built_in">print</span>(df[[<span class="hljs-string">&quot;Title&quot;</span>, <span class="hljs-string">&quot;Year&quot;</span>, <span class="hljs-string">&quot;Genre&quot;</span>, <span class="hljs-string">&quot;imdbRating&quot;</span>]])
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="99" data-paginate="true" data-theme="iitgn-modern" lang="en-IN" data-marpit-pagination="99" style="--paginate:true;--theme:iitgn-modern;" data-marpit-pagination-total="131">

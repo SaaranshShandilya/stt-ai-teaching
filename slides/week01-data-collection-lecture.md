@@ -1479,23 +1479,19 @@ print(response.json())
 
 ```python
 import requests
-response = requests.get(
-    "https://www.omdbapi.com/",
-    params={
-        "apikey": "demo",      # replace with real key for reliability
-        "t": "Inception"
-    }
-)
-print(response.status_code)        # 200
+response = requests.get("https://nipun-api-testing.hf.space/items")
 
-print(response.headers["Content-Type"])  
+response.status_code        # 200
+response.headers["Content-Type"]  # 'application/json'
+response.text               # Raw text (string)
+response.json()             # Parsed as Python dict
+response.ok                 # True for 2xx status codes
+```
 
-
-print(response.text) # Body as raw text (string)              
-
-# Body parsed as JSON (Python dict)
-print(response.json())            
-print(response.ok) # True for 2xx status codes                 
+```python
+# Example output
+>>> response.json()
+{'items': [{'id': 1, 'name': 'Apple', ...}], 'count': 3}
 ```
 
 ---
@@ -1507,17 +1503,10 @@ import requests
 
 response = requests.post(
     "https://nipun-api-testing.hf.space/items",
-    json={
-        "name": "Laptop",
-        "price": 999.99,
-        "quantity": 1,
-        "description": "A powerful laptop"
-    }
+    json={"name": "Laptop", "price": 999.99, "quantity": 1}
 )
-
-print(response.status_code)
-print(response.json())
-
+print(response.status_code)  # 201 (Created)
+print(response.json())       # {'id': 4, 'name': 'Laptop', ...}
 ```
 
 ---
@@ -1525,58 +1514,36 @@ print(response.json())
 # requests: POST with Form Data
 
 ```python
-import requests
-
-url = "https://nipun-api-testing.hf.space/form/contact"
-
-data = {
-    "name": "Alice",
-    "email": "alice@example.com",
-    "subject": "Hello",
-    "message": "Nice API!"
-}
-
-response = requests.post(url, data=data)
-
-print(response.status_code)
-print(response.json())
-
+response = requests.post(
+    "https://nipun-api-testing.hf.space/form/contact",
+    data={"name": "Alice", "email": "alice@example.com", "message": "Hello!"}
+)
+print(response.json())  # {'status': 'received', 'name': 'Alice', ...}
 ```
 
 **Remember:**
-- `json=` → Content-Type: application/json
-- `data=` → Content-Type: application/x-www-form-urlencoded
+- `json=` → sends JSON (Content-Type: application/json)
+- `data=` → sends form data (Content-Type: application/x-www-form-urlencoded)
 
 ---
 
 # requests: Error Handling
 
 ```python
-url = "https://www.omdbapi.com/"
-params = {
-    "apikey": "demo",   # replace with real key if needed
-    "t": "Inception"
-}
 try:
-    response = requests.get(url, params=params, timeout=10)
-    response.raise_for_status() # Raise exception for 4xx / 5xx responses
-
+    response = requests.get("https://nipun-api-testing.hf.space/items", timeout=10)
+    response.raise_for_status()  # Raises exception for 4xx/5xx
     data = response.json()
-    print(data["Title"], data["Year"])
-
 except requests.exceptions.Timeout:
     print("Request timed out")
-
 except requests.exceptions.HTTPError as e:
     print(f"HTTP error: {e}")
-
 except requests.exceptions.RequestException as e:
     print(f"Request failed: {e}")
-
 ```
 
 **Key points:**
-- Always set `timeout` to avoid hanging
+- Always set `timeout` to avoid hanging forever
 - `raise_for_status()` converts bad status codes to exceptions
 
 ---
@@ -1584,32 +1551,20 @@ except requests.exceptions.RequestException as e:
 # requests: Looping Over Multiple Items
 
 ```python
-movies = ["Inception", "Avatar", "The Matrix", "Interstellar"]
+movies = ["Inception", "Avatar", "The Matrix"]
 results = []
-
-url = "https://www.omdbapi.com/"
-params_base = {
-    "apikey": "demo"   # replace with your real key for reliability
-}
 
 for title in movies:
     response = requests.get(
-        url,
-        params={**params_base, "t": title},
-        timeout=10
+        "https://www.omdbapi.com/",
+        params={"apikey": "YOUR_KEY", "t": title}, timeout=10
     )
+    if response.ok and response.json().get("Response") == "True":
+        results.append(response.json())
+        print(f"Got: {title}")
+    time.sleep(1)  # Be polite - don't hammer the server
 
-    if response.ok:
-        data = response.json()
-        if data.get("Response") == "True": # Application-level success check
-            results.append(data)
-            print(f"Got: {title}")
-        else:
-            print(f"Not found: {title} ({data.get('Error')})")
-    else:
-        print(f"HTTP error for {title}: {response.status_code}")
 print(f"Collected {len(results)} movies")
-
 ```
 
 ---
@@ -1617,56 +1572,36 @@ print(f"Collected {len(results)} movies")
 # requests: Session for Multiple Requests
 
 ```python
-import requests
-
-# Create a session (persists headers, cookies, connections)
 session = requests.Session()
+session.headers.update({"Authorization": "Bearer token123", "User-Agent": "MyApp/1.0"})
 
-# Set default headers once
-session.headers.update({
-    "Authorization": "Bearer test-token-123",
-    "User-Agent": "MyApp/1.0"
-})
-
-# All requests now reuse headers + connection
-r1 = session.get("https://httpbin.org/headers")
-r2 = session.get("https://httpbin.org/headers")
-r3 = session.get("https://httpbin.org/headers")
-
-print(r1.status_code)
-print(r1.json()["headers"]["User-Agent"])
-print(r1.json()["headers"]["Authorization"])
-
+# All requests reuse headers + TCP connection (faster!)
+r1 = session.get("https://nipun-api-testing.hf.space/headers")
+r2 = session.get("https://nipun-api-testing.hf.space/items")
 ```
+
+**Benefits:**
+- Persistent headers (set once, use everywhere)
+- Connection pooling (faster for many requests)
+- Cookie persistence (for auth sessions)
 
 ---
 
 # requests: Practical Example
 
 ```python
-def fetch_movie_data(titles, api_key):
+def fetch_movies(titles, api_key):
     movies = []
-
     for title in titles:
-        response = requests.get(
-            "https://www.omdbapi.com/",
-            params={"apikey": api_key, "t": title}, timeout=10
-        )
-        
-        if response.ok: # Check HTTP + API-level success
-            data = response.json()
-            if data.get("Response") == "True":
-                movies.append(data)
-            else:
-                print(f"Movie not found: {title}")
-        else:
-            print(f"HTTP error for {title}: {response.status_code}")
+        r = requests.get("https://www.omdbapi.com/",
+                        params={"apikey": api_key, "t": title}, timeout=10)
+        if r.ok and r.json().get("Response") == "True":
+            movies.append(r.json())
+        time.sleep(0.5)
+    return pd.DataFrame(movies)
 
-    return pd.DataFrame(movies) # Convert to pandas DataFrame
-
-df = fetch_movie_data(["Inception", "Avatar"], "demo")  # demo API key
-print(df[["Title", "Year", "Genre"]])
-
+df = fetch_movies(["Inception", "Avatar", "The Matrix"], "YOUR_KEY")
+print(df[["Title", "Year", "Genre", "imdbRating"]])
 ```
 
 ---
