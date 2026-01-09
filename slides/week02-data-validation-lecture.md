@@ -736,33 +736,21 @@ The Matrix,1999,136 min,8.7,$463517383,"Action, Sci-Fi",R
 
 ---
 
-# Putting It Together: Initial Inspection Script
+# Putting It Together: Initial Inspection
 
 ```bash
-#!/bin/bash
-FILE=$1
+# Run: bash inspect_data.sh (in lecture-demos/week02/)
 
-echo "=== File Info ==="
-file "$FILE"
-ls -lh "$FILE"
+# Quick one-liner inspection
+file movies.csv && wc -l movies.csv && head -3 movies.csv
 
-echo -e "\n=== Line Count ==="
-wc -l "$FILE"
-
-echo -e "\n=== First 5 Lines ==="
-head -5 "$FILE"
-
-echo -e "\n=== Last 5 Lines ==="
-tail -5 "$FILE"
-
-echo -e "\n=== Potential Issues ==="
-echo "N/A values: $(grep -c 'N/A' "$FILE")"
-echo "Empty fields: $(grep -c ',,' "$FILE")"
-echo "Duplicate lines: \
-$(sort "$FILE" | uniq -d | wc -l)"
-
-
+# Check for issues
+echo "N/A values: $(grep -c 'N/A' movies.csv)"
+echo "Empty fields: $(grep -c ',,' movies.csv)"
+echo "Duplicates: $(cut -d',' -f1 movies.csv | sort | uniq -d | wc -l)"
 ```
+
+**See full script:** `lecture-demos/week02/inspect_data.sh`
 
 ---
 
@@ -1639,25 +1627,16 @@ $ csvcut -c rating movies.csv | sort | uniq -c | sort -rn | head
 
 <div class="insight">
 
-**Think of a schema like a building blueprint**: Before construction begins, everyone agrees on what the building should look like. The blueprint defines rooms, dimensions, materials - and the building must match.
+**Schema = Blueprint**: Before construction, everyone agrees on what to build. The blueprint defines structure - and the building must match.
 
 </div>
 
----
-
-# Schema: The Blueprint Analogy
-
-**Without blueprint (schema):**
-- Builder guesses what's needed
-- Inspector can't verify if it's correct
-- Different workers make inconsistent decisions
-- Problems discovered when building collapses
-
-**With blueprint (schema):**
-- Clear expectations documented upfront
-- Automatic verification at each step
-- Everyone builds the same thing
-- Problems caught before they become disasters
+| Without Schema | With Schema |
+|----------------|-------------|
+| Builder guesses what's needed | Clear expectations upfront |
+| Can't verify if correct | Automatic verification |
+| Inconsistent decisions | Everyone builds the same |
+| Problems found when it breaks | Problems caught early |
 
 ---
 
@@ -1790,26 +1769,22 @@ schema = {
 
 ```json
 {
-  "type": "array",
-  "items": {
-    "type": "string"           // All items must be strings
-  },
-  "minItems": 1,               // At least 1 item
-  "maxItems": 10,              // At most 10 items
-  "uniqueItems": true          // No duplicates
-}
-```
-
-**Example for genres:**
-```json
-{
   "genres": {
     "type": "array",
     "items": {"type": "string"},
-    "minItems": 1
+    "minItems": 1,
+    "maxItems": 10,
+    "uniqueItems": true
   }
 }
 ```
+
+| Keyword | Meaning |
+|---------|---------|
+| `items` | Schema for each element |
+| `minItems` | Minimum array length |
+| `maxItems` | Maximum array length |
+| `uniqueItems` | No duplicates allowed |
 
 ---
 
@@ -1857,27 +1832,21 @@ schema = {
 # Complete Movie Schema Example
 
 ```json
+// lecture-demos/week02/data/movie_schema.json
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
     "title": {"type": "string", "minLength": 1},
-    "year": {"type": "integer", "minimum": 1880, "maximum": 2030},
+    "year": {"type": "integer", "minimum": 1888, "maximum": 2030},
     "rating": {"type": ["number", "null"], "minimum": 0, "maximum": 10},
-    "revenue": {"type": ["integer", "null"], "minimum": 0},
-    "genres": {
-      "type": "array",
-      "items": {"type": "string"},
-      "minItems": 1
-    },
-    "rated": {
-      "type": "string",
-      "enum": ["G", "PG", "PG-13", "R", "NC-17", "Not Rated"]
-    }
+    "genres": {"type": "array", "items": {"type": "string"}},
+    "rated": {"enum": ["G", "PG", "PG-13", "R", "NC-17", "Not Rated"]}
   },
-  "required": ["title", "year", "genres"]
+  "required": ["title", "year"]
 }
 ```
+
+**Full schema:** `cat data/movie_schema.json | jq .`
 
 ---
 
@@ -2357,20 +2326,31 @@ pd.read_csv('file.csv', encoding='utf-8')
 
 **2. Use proper CSV parsers:**
 ```python
-# Good
+# Good - handles quoted commas
 import csv
 with open('file.csv') as f:
     reader = csv.reader(f)
 
-# Bad
-with open('file.csv') as f:
-    for line in f:
-        fields = line.split(',')  # Breaks on quoted commas!
+# Bad - breaks on "Action, Drama"
+fields = line.split(',')
 ```
+
+---
+
+# Handling Edge Cases: Validation
 
 **3. Validate after reading:**
 ```python
 assert df['year'].dtype == 'int64', "Year should be integer"
+assert df['rating'].between(0, 10).all(), "Rating out of range"
+```
+
+**4. Handle missing values explicitly:**
+```python
+# Don't guess - be explicit
+df['year'] = pd.to_numeric(df['year'], errors='coerce')
+missing_count = df['year'].isna().sum()
+print(f"Converted {missing_count} invalid years to NaN")
 ```
 
 ---
