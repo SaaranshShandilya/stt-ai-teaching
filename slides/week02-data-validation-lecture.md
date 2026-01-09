@@ -1627,21 +1627,16 @@ $ csvcut -c rating movies.csv | sort | uniq -c | sort -rn | head
 
 <div class="insight">
 
-**Think of a schema like a building blueprint**: Before construction begins, everyone agrees on what the building should look like. The blueprint defines rooms, dimensions, materials - and the building must match.
+**Schema = Blueprint**: Before construction, everyone agrees on what to build. The blueprint defines structure - and the building must match.
 
 </div>
 
-**Without blueprint (schema):**
-- Builder guesses what's needed
-- Inspector can't verify if it's correct
-- Different workers make inconsistent decisions
-- Problems discovered when building collapses
-
-**With blueprint (schema):**
-- Clear expectations documented upfront
-- Automatic verification at each step
-- Everyone builds the same thing
-- Problems caught before they become disasters
+| Without Schema | With Schema |
+|----------------|-------------|
+| Builder guesses what's needed | Clear expectations upfront |
+| Can't verify if correct | Automatic verification |
+| Inconsistent decisions | Everyone builds the same |
+| Problems found when it breaks | Problems caught early |
 
 ---
 
